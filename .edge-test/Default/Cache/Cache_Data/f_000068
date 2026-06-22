@@ -1,0 +1,391 @@
+import { createHotContext as __vite__createHotContext } from "/@vite/client";import.meta.hot = __vite__createHotContext("/src/pages/About.jsx");import __vite__cjsImport0_react_jsxDevRuntime from "/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=722ab6a6"; const jsxDEV = __vite__cjsImport0_react_jsxDevRuntime["jsxDEV"];
+import * as RefreshRuntime from "/@react-refresh";
+const inWebWorker = typeof WorkerGlobalScope !== "undefined" && self instanceof WorkerGlobalScope;
+let prevRefreshReg;
+let prevRefreshSig;
+if (import.meta.hot && !inWebWorker) {
+  if (!window.$RefreshReg$) {
+    throw new Error(
+      "@vitejs/plugin-react can't detect preamble. Something is wrong."
+    );
+  }
+  prevRefreshReg = window.$RefreshReg$;
+  prevRefreshSig = window.$RefreshSig$;
+  window.$RefreshReg$ = RefreshRuntime.getRefreshReg("C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/pages/About.jsx");
+  window.$RefreshSig$ = RefreshRuntime.createSignatureFunctionForTransform;
+}
+var _s = $RefreshSig$();
+import __vite__cjsImport3_react from "/node_modules/.vite/deps/react.js?v=722ab6a6"; const React = __vite__cjsImport3_react.__esModule ? __vite__cjsImport3_react.default : __vite__cjsImport3_react; const useState = __vite__cjsImport3_react["useState"]; const useEffect = __vite__cjsImport3_react["useEffect"];
+import { motion } from "/node_modules/.vite/deps/framer-motion.js?v=722ab6a6";
+import axios from "/node_modules/.vite/deps/axios.js?v=722ab6a6";
+export default function About() {
+  _s();
+  const [content, setContent] = useState(null);
+  useEffect(() => {
+    fetchContent();
+  }, []);
+  const fetchContent = async () => {
+    try {
+      const res = await axios.get("/api/content/about");
+      setContent(res.data);
+    } catch (error) {
+      console.error("Error fetching content:", error);
+    }
+  };
+  return /* @__PURE__ */ jsxDEV("div", { className: "min-h-screen pt-20", children: [
+    /* @__PURE__ */ jsxDEV("section", { className: "py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-transparent to-blue-50 dark:to-blue-950/20", children: /* @__PURE__ */ jsxDEV("div", { className: "max-w-7xl mx-auto text-center", children: [
+      /* @__PURE__ */ jsxDEV(
+        motion.h1,
+        {
+          className: "text-5xl font-bold mb-4 gradient-text",
+          initial: { opacity: 0, y: 20 },
+          animate: { opacity: 1, y: 0 },
+          transition: { duration: 0.6 },
+          children: "About Us"
+        },
+        void 0,
+        false,
+        {
+          fileName: "C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/pages/About.jsx",
+          lineNumber: 45,
+          columnNumber: 11
+        },
+        this
+      ),
+      /* @__PURE__ */ jsxDEV(
+        motion.p,
+        {
+          className: "text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto",
+          initial: { opacity: 0, y: 20 },
+          animate: { opacity: 1, y: 0 },
+          transition: { duration: 0.6, delay: 0.2 },
+          children: "Learn about our mission, values, and the journey that makes us unique."
+        },
+        void 0,
+        false,
+        {
+          fileName: "C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/pages/About.jsx",
+          lineNumber: 53,
+          columnNumber: 11
+        },
+        this
+      )
+    ] }, void 0, true, {
+      fileName: "C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/pages/About.jsx",
+      lineNumber: 44,
+      columnNumber: 9
+    }, this) }, void 0, false, {
+      fileName: "C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/pages/About.jsx",
+      lineNumber: 43,
+      columnNumber: 7
+    }, this),
+    /* @__PURE__ */ jsxDEV("section", { className: "py-20 px-4 sm:px-6 lg:px-8", children: /* @__PURE__ */ jsxDEV("div", { className: "max-w-4xl mx-auto space-y-12", children: [
+      /* @__PURE__ */ jsxDEV(
+        motion.div,
+        {
+          className: "glassmorphism p-12 rounded-2xl",
+          initial: { opacity: 0, y: 20 },
+          whileInView: { opacity: 1, y: 0 },
+          transition: { duration: 0.6 },
+          viewport: { once: true },
+          children: [
+            /* @__PURE__ */ jsxDEV("h2", { className: "text-3xl font-bold mb-6 gradient-text", children: "IEEE Education Society" }, void 0, false, {
+              fileName: "C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/pages/About.jsx",
+              lineNumber: 75,
+              columnNumber: 13
+            }, this),
+            /* @__PURE__ */ jsxDEV("div", { className: "space-y-4 text-gray-700 dark:text-gray-300 leading-relaxed", children: [
+              /* @__PURE__ */ jsxDEV("p", { children: "IEEE Education Society (EDS) is one of the largest technical societies within IEEE, dedicated to advancing education and technology. With a rich history spanning several decades, EDS has become the premier organization for educators, students, and professionals in the field of technology and engineering education." }, void 0, false, {
+                fileName: "C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/pages/About.jsx",
+                lineNumber: 77,
+                columnNumber: 15
+              }, this),
+              /* @__PURE__ */ jsxDEV("p", { children: "Our global network includes over 400,000 members across 160 countries, united by a passion for innovation, knowledge sharing, and professional development." }, void 0, false, {
+                fileName: "C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/pages/About.jsx",
+                lineNumber: 80,
+                columnNumber: 15
+              }, this),
+              /* @__PURE__ */ jsxDEV("p", { children: "IEEE EDS focuses on various domains including:" }, void 0, false, {
+                fileName: "C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/pages/About.jsx",
+                lineNumber: 83,
+                columnNumber: 15
+              }, this),
+              /* @__PURE__ */ jsxDEV("ul", { className: "list-disc list-inside space-y-2 pl-4", children: [
+                /* @__PURE__ */ jsxDEV("li", { children: "Engineering Education" }, void 0, false, {
+                  fileName: "C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/pages/About.jsx",
+                  lineNumber: 87,
+                  columnNumber: 17
+                }, this),
+                /* @__PURE__ */ jsxDEV("li", { children: "Educational Technology" }, void 0, false, {
+                  fileName: "C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/pages/About.jsx",
+                  lineNumber: 88,
+                  columnNumber: 17
+                }, this),
+                /* @__PURE__ */ jsxDEV("li", { children: "Professional Development" }, void 0, false, {
+                  fileName: "C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/pages/About.jsx",
+                  lineNumber: 89,
+                  columnNumber: 17
+                }, this),
+                /* @__PURE__ */ jsxDEV("li", { children: "Student Mentorship" }, void 0, false, {
+                  fileName: "C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/pages/About.jsx",
+                  lineNumber: 90,
+                  columnNumber: 17
+                }, this),
+                /* @__PURE__ */ jsxDEV("li", { children: "Research and Innovation" }, void 0, false, {
+                  fileName: "C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/pages/About.jsx",
+                  lineNumber: 91,
+                  columnNumber: 17
+                }, this)
+              ] }, void 0, true, {
+                fileName: "C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/pages/About.jsx",
+                lineNumber: 86,
+                columnNumber: 15
+              }, this)
+            ] }, void 0, true, {
+              fileName: "C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/pages/About.jsx",
+              lineNumber: 76,
+              columnNumber: 13
+            }, this)
+          ]
+        },
+        void 0,
+        true,
+        {
+          fileName: "C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/pages/About.jsx",
+          lineNumber: 68,
+          columnNumber: 11
+        },
+        this
+      ),
+      /* @__PURE__ */ jsxDEV(
+        motion.div,
+        {
+          className: "glassmorphism p-12 rounded-2xl",
+          initial: { opacity: 0, y: 20 },
+          whileInView: { opacity: 1, y: 0 },
+          transition: { duration: 0.6, delay: 0.1 },
+          viewport: { once: true },
+          children: [
+            /* @__PURE__ */ jsxDEV("h2", { className: "text-3xl font-bold mb-6 gradient-text", children: "Our Student Branch Chapter" }, void 0, false, {
+              fileName: "C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/pages/About.jsx",
+              lineNumber: 104,
+              columnNumber: 13
+            }, this),
+            /* @__PURE__ */ jsxDEV("div", { className: "space-y-4 text-gray-700 dark:text-gray-300 leading-relaxed", children: [
+              /* @__PURE__ */ jsxDEV("p", { children: "Our Student Branch Chapter serves as a vibrant hub for students passionate about technology and education. We are committed to bridging the gap between academic learning and industry practices." }, void 0, false, {
+                fileName: "C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/pages/About.jsx",
+                lineNumber: 106,
+                columnNumber: 15
+              }, this),
+              /* @__PURE__ */ jsxDEV("p", { children: "Through our chapter, students get exposure to:" }, void 0, false, {
+                fileName: "C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/pages/About.jsx",
+                lineNumber: 109,
+                columnNumber: 15
+              }, this),
+              /* @__PURE__ */ jsxDEV("ul", { className: "list-disc list-inside space-y-2 pl-4", children: [
+                /* @__PURE__ */ jsxDEV("li", { children: "Technical workshops and hands-on training" }, void 0, false, {
+                  fileName: "C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/pages/About.jsx",
+                  lineNumber: 113,
+                  columnNumber: 17
+                }, this),
+                /* @__PURE__ */ jsxDEV("li", { children: "Networking with industry professionals" }, void 0, false, {
+                  fileName: "C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/pages/About.jsx",
+                  lineNumber: 114,
+                  columnNumber: 17
+                }, this),
+                /* @__PURE__ */ jsxDEV("li", { children: "Mentorship from experienced faculty and engineers" }, void 0, false, {
+                  fileName: "C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/pages/About.jsx",
+                  lineNumber: 115,
+                  columnNumber: 17
+                }, this),
+                /* @__PURE__ */ jsxDEV("li", { children: "Participation in hackathons and competitions" }, void 0, false, {
+                  fileName: "C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/pages/About.jsx",
+                  lineNumber: 116,
+                  columnNumber: 17
+                }, this),
+                /* @__PURE__ */ jsxDEV("li", { children: "Leadership and team development opportunities" }, void 0, false, {
+                  fileName: "C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/pages/About.jsx",
+                  lineNumber: 117,
+                  columnNumber: 17
+                }, this),
+                /* @__PURE__ */ jsxDEV("li", { children: "Career guidance and placement assistance" }, void 0, false, {
+                  fileName: "C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/pages/About.jsx",
+                  lineNumber: 118,
+                  columnNumber: 17
+                }, this)
+              ] }, void 0, true, {
+                fileName: "C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/pages/About.jsx",
+                lineNumber: 112,
+                columnNumber: 15
+              }, this)
+            ] }, void 0, true, {
+              fileName: "C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/pages/About.jsx",
+              lineNumber: 105,
+              columnNumber: 13
+            }, this)
+          ]
+        },
+        void 0,
+        true,
+        {
+          fileName: "C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/pages/About.jsx",
+          lineNumber: 97,
+          columnNumber: 11
+        },
+        this
+      ),
+      /* @__PURE__ */ jsxDEV("div", { className: "grid md:grid-cols-2 gap-8", children: [
+        /* @__PURE__ */ jsxDEV(
+          motion.div,
+          {
+            className: "glassmorphism p-8 rounded-2xl",
+            initial: { opacity: 0, x: -20 },
+            whileInView: { opacity: 1, x: 0 },
+            transition: { duration: 0.6 },
+            viewport: { once: true },
+            children: [
+              /* @__PURE__ */ jsxDEV("h3", { className: "text-2xl font-bold mb-4 text-blue-600", children: "Vision" }, void 0, false, {
+                fileName: "C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/pages/About.jsx",
+                lineNumber: 132,
+                columnNumber: 15
+              }, this),
+              /* @__PURE__ */ jsxDEV("p", { className: "text-gray-700 dark:text-gray-300 leading-relaxed", children: "To inspire and empower a global community of learners to innovate, lead, and create positive change through technology and education." }, void 0, false, {
+                fileName: "C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/pages/About.jsx",
+                lineNumber: 133,
+                columnNumber: 15
+              }, this)
+            ]
+          },
+          void 0,
+          true,
+          {
+            fileName: "C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/pages/About.jsx",
+            lineNumber: 125,
+            columnNumber: 13
+          },
+          this
+        ),
+        /* @__PURE__ */ jsxDEV(
+          motion.div,
+          {
+            className: "glassmorphism p-8 rounded-2xl",
+            initial: { opacity: 0, x: 20 },
+            whileInView: { opacity: 1, x: 0 },
+            transition: { duration: 0.6 },
+            viewport: { once: true },
+            children: [
+              /* @__PURE__ */ jsxDEV("h3", { className: "text-2xl font-bold mb-4 text-cyan-600", children: "Mission" }, void 0, false, {
+                fileName: "C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/pages/About.jsx",
+                lineNumber: 145,
+                columnNumber: 15
+              }, this),
+              /* @__PURE__ */ jsxDEV("p", { className: "text-gray-700 dark:text-gray-300 leading-relaxed", children: "To provide world-class technical education, foster innovation, develop future leaders, and create sustainable impact through technology and knowledge sharing." }, void 0, false, {
+                fileName: "C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/pages/About.jsx",
+                lineNumber: 146,
+                columnNumber: 15
+              }, this)
+            ]
+          },
+          void 0,
+          true,
+          {
+            fileName: "C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/pages/About.jsx",
+            lineNumber: 138,
+            columnNumber: 13
+          },
+          this
+        )
+      ] }, void 0, true, {
+        fileName: "C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/pages/About.jsx",
+        lineNumber: 124,
+        columnNumber: 11
+      }, this),
+      /* @__PURE__ */ jsxDEV(
+        motion.div,
+        {
+          className: "glassmorphism p-12 rounded-2xl",
+          initial: { opacity: 0, y: 20 },
+          whileInView: { opacity: 1, y: 0 },
+          transition: { duration: 0.6, delay: 0.2 },
+          viewport: { once: true },
+          children: [
+            /* @__PURE__ */ jsxDEV("h3", { className: "text-3xl font-bold mb-8 gradient-text", children: "Our Core Values" }, void 0, false, {
+              fileName: "C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/pages/About.jsx",
+              lineNumber: 160,
+              columnNumber: 13
+            }, this),
+            /* @__PURE__ */ jsxDEV("div", { className: "grid md:grid-cols-2 gap-6", children: [
+              { title: "Excellence", desc: "We strive for the highest standards in everything we do." },
+              { title: "Innovation", desc: "We embrace new ideas and creative solutions." },
+              { title: "Collaboration", desc: "We believe in the power of teamwork and knowledge sharing." },
+              { title: "Integrity", desc: "We uphold ethical principles in all our actions." },
+              { title: "Inclusivity", desc: "We welcome diverse perspectives and create inclusive communities." },
+              { title: "Impact", desc: "We focus on creating meaningful and lasting positive change." }
+            ].map(
+              (value, i) => /* @__PURE__ */ jsxDEV("div", { className: "p-4 bg-white/5 rounded-lg border border-white/10", children: [
+                /* @__PURE__ */ jsxDEV("h4", { className: "font-bold text-lg mb-2", children: value.title }, void 0, false, {
+                  fileName: "C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/pages/About.jsx",
+                  lineNumber: 171,
+                  columnNumber: 19
+                }, this),
+                /* @__PURE__ */ jsxDEV("p", { className: "text-sm text-gray-600 dark:text-gray-400", children: value.desc }, void 0, false, {
+                  fileName: "C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/pages/About.jsx",
+                  lineNumber: 172,
+                  columnNumber: 19
+                }, this)
+              ] }, i, true, {
+                fileName: "C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/pages/About.jsx",
+                lineNumber: 170,
+                columnNumber: 15
+              }, this)
+            ) }, void 0, false, {
+              fileName: "C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/pages/About.jsx",
+              lineNumber: 161,
+              columnNumber: 13
+            }, this)
+          ]
+        },
+        void 0,
+        true,
+        {
+          fileName: "C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/pages/About.jsx",
+          lineNumber: 153,
+          columnNumber: 11
+        },
+        this
+      )
+    ] }, void 0, true, {
+      fileName: "C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/pages/About.jsx",
+      lineNumber: 66,
+      columnNumber: 9
+    }, this) }, void 0, false, {
+      fileName: "C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/pages/About.jsx",
+      lineNumber: 65,
+      columnNumber: 7
+    }, this)
+  ] }, void 0, true, {
+    fileName: "C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/pages/About.jsx",
+    lineNumber: 41,
+    columnNumber: 5
+  }, this);
+}
+_s(About, "KAjm4yvD8rjPsAfNiedPNdoqWs4=");
+_c = About;
+var _c;
+$RefreshReg$(_c, "About");
+if (import.meta.hot && !inWebWorker) {
+  window.$RefreshReg$ = prevRefreshReg;
+  window.$RefreshSig$ = prevRefreshSig;
+}
+if (import.meta.hot && !inWebWorker) {
+  RefreshRuntime.__hmr_import(import.meta.url).then((currentExports) => {
+    RefreshRuntime.registerExportsForReactRefresh("C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/pages/About.jsx", currentExports);
+    import.meta.hot.accept((nextExports) => {
+      if (!nextExports) return;
+      const invalidateMessage = RefreshRuntime.validateRefreshBoundaryAndEnqueueUpdate("C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/pages/About.jsx", currentExports, nextExports);
+      if (invalidateMessage) import.meta.hot.invalidate(invalidateMessage);
+    });
+  });
+}
+
+//# sourceMappingURL=data:application/json;base64,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T0FBRSxXQUFVLDRDQUE0Q0csZ0JBQU1GLFFBQS9EO0FBQUE7QUFBQTtBQUFBO0FBQUEsdUJBQW9FO0FBQUEsbUJBRjVERyxHQUFWO0FBQUE7QUFBQTtBQUFBO0FBQUEscUJBR0E7QUFBQSxZQUNELEtBYkg7QUFBQTtBQUFBO0FBQUE7QUFBQSxtQkFjQTtBQUFBO0FBQUE7QUFBQSxRQXRCRjtBQUFBO0FBQUE7QUFBQTtBQUFBO0FBQUE7QUFBQTtBQUFBO0FBQUEsTUF1QkE7QUFBQSxTQTlHRjtBQUFBO0FBQUE7QUFBQTtBQUFBLFdBK0dBLEtBaEhGO0FBQUE7QUFBQTtBQUFBO0FBQUEsV0FpSEE7QUFBQSxPQXpJRjtBQUFBO0FBQUE7QUFBQTtBQUFBLFNBMElBO0FBRUo7QUFBQ25CLEdBN0p1QkQsT0FBSztBQUFBLEtBQUxBO0FBQUssSUFBQXFCO0FBQUEsYUFBQUEsSUFBQSIsIm5hbWVzIjpbIlJlYWN0IiwidXNlU3RhdGUiLCJ1c2VFZmZlY3QiLCJtb3Rpb24iLCJheGlvcyIsIkFib3V0IiwiX3MiLCJjb250ZW50Iiwic2V0Q29udGVudCIsImZldGNoQ29udGVudCIsInJlcyIsImdldCIsImRhdGEiLCJlcnJvciIsImNvbnNvbGUiLCJvcGFjaXR5IiwieSIsImR1cmF0aW9uIiwiZGVsYXkiLCJvbmNlIiwieCIsInRpdGxlIiwiZGVzYyIsIm1hcCIsInZhbHVlIiwiaSIsIl9jIl0sImlnbm9yZUxpc3QiOltdLCJzb3VyY2VzIjpbIkFib3V0LmpzeCJdLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQgUmVhY3QsIHsgdXNlU3RhdGUsIHVzZUVmZmVjdCB9IGZyb20gJ3JlYWN0JztcclxuaW1wb3J0IHsgbW90aW9uIH0gZnJvbSAnZnJhbWVyLW1vdGlvbic7XHJcbmltcG9ydCBheGlvcyBmcm9tICdheGlvcyc7XHJcblxyXG5leHBvcnQgZGVmYXVsdCBmdW5jdGlvbiBBYm91dCgpIHtcclxuICBjb25zdCBbY29udGVudCwgc2V0Q29udGVudF0gPSB1c2VTdGF0ZShudWxsKTtcclxuXHJcbiAgdXNlRWZmZWN0KCgpID0+IHtcclxuICAgIGZldGNoQ29udGVudCgpO1xyXG4gIH0sIFtdKTtcclxuXHJcbiAgY29uc3QgZmV0Y2hDb250ZW50ID0gYXN5bmMgKCkgPT4ge1xyXG4gICAgdHJ5IHtcclxuICAgICAgY29uc3QgcmVzID0gYXdhaXQgYXhpb3MuZ2V0KCcvYXBpL2NvbnRlbnQvYWJvdXQnKTtcclxuICAgICAgc2V0Q29udGVudChyZXMuZGF0YSk7XHJcbiAgICB9IGNhdGNoIChlcnJvcikge1xyXG4gICAgICBjb25zb2xlLmVycm9yKCdFcnJvciBmZXRjaGluZyBjb250ZW50OicsIGVycm9yKTtcclxuICAgIH1cclxuICB9O1xyXG5cclxuICByZXR1cm4gKFxyXG4gICAgPGRpdiBjbGFzc05hbWU9XCJtaW4taC1zY3JlZW4gcHQtMjBcIj5cclxuICAgICAgey8qIEhlcm8gKi99XHJcbiAgICAgIDxzZWN0aW9uIGNsYXNzTmFtZT1cInB5LTEyIHB4LTQgc206cHgtNiBsZzpweC04IGJnLWdyYWRpZW50LXRvLWIgZnJvbS10cmFuc3BhcmVudCB0by1ibHVlLTUwIGRhcms6dG8tYmx1ZS05NTAvMjBcIj5cclxuICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cIm1heC13LTd4bCBteC1hdXRvIHRleHQtY2VudGVyXCI+XHJcbiAgICAgICAgICA8bW90aW9uLmgxXHJcbiAgICAgICAgICAgIGNsYXNzTmFtZT1cInRleHQtNXhsIGZvbnQtYm9sZCBtYi00IGdyYWRpZW50LXRleHRcIlxyXG4gICAgICAgICAgICBpbml0aWFsPXt7IG9wYWNpdHk6IDAsIHk6IDIwIH19XHJcbiAgICAgICAgICAgIGFuaW1hdGU9e3sgb3BhY2l0eTogMSwgeTogMCB9fVxyXG4gICAgICAgICAgICB0cmFuc2l0aW9uPXt7IGR1cmF0aW9uOiAwLjYgfX1cclxuICAgICAgICAgID5cclxuICAgICAgICAgICAgQWJvdXQgVXNcclxuICAgICAgICAgIDwvbW90aW9uLmgxPlxyXG4gICAgICAgICAgPG1vdGlvbi5wXHJcbiAgICAgICAgICAgIGNsYXNzTmFtZT1cInRleHQtbGcgdGV4dC1ncmF5LTYwMCBkYXJrOnRleHQtZ3JheS00MDAgbWF4LXctMnhsIG14LWF1dG9cIlxyXG4gICAgICAgICAgICBpbml0aWFsPXt7IG9wYWNpdHk6IDAsIHk6IDIwIH19XHJcbiAgICAgICAgICAgIGFuaW1hdGU9e3sgb3BhY2l0eTogMSwgeTogMCB9fVxyXG4gICAgICAgICAgICB0cmFuc2l0aW9uPXt7IGR1cmF0aW9uOiAwLjYsIGRlbGF5OiAwLjIgfX1cclxuICAgICAgICAgID5cclxuICAgICAgICAgICAgTGVhcm4gYWJvdXQgb3VyIG1pc3Npb24sIHZhbHVlcywgYW5kIHRoZSBqb3VybmV5IHRoYXQgbWFrZXMgdXMgdW5pcXVlLlxyXG4gICAgICAgICAgPC9tb3Rpb24ucD5cclxuICAgICAgICA8L2Rpdj5cclxuICAgICAgPC9zZWN0aW9uPlxyXG5cclxuICAgICAgey8qIE1haW4gQ29udGVudCAqL31cclxuICAgICAgPHNlY3Rpb24gY2xhc3NOYW1lPVwicHktMjAgcHgtNCBzbTpweC02IGxnOnB4LThcIj5cclxuICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cIm1heC13LTR4bCBteC1hdXRvIHNwYWNlLXktMTJcIj5cclxuICAgICAgICAgIHsvKiBJRUVFIEVkdWNhdGlvbiBTb2NpZXR5IFNlY3Rpb24gKi99XG4gICAgICAgICAgPG1vdGlvbi5kaXZcclxuICAgICAgICAgICAgY2xhc3NOYW1lPVwiZ2xhc3Ntb3JwaGlzbSBwLTEyIHJvdW5kZWQtMnhsXCJcclxuICAgICAgICAgICAgaW5pdGlhbD17eyBvcGFjaXR5OiAwLCB5OiAyMCB9fVxyXG4gICAgICAgICAgICB3aGlsZUluVmlldz17eyBvcGFjaXR5OiAxLCB5OiAwIH19XHJcbiAgICAgICAgICAgIHRyYW5zaXRpb249e3sgZHVyYXRpb246IDAuNiB9fVxyXG4gICAgICAgICAgICB2aWV3cG9ydD17eyBvbmNlOiB0cnVlIH19XHJcbiAgICAgICAgICA+XHJcbiAgICAgICAgICAgIDxoMiBjbGFzc05hbWU9XCJ0ZXh0LTN4bCBmb250LWJvbGQgbWItNiBncmFkaWVudC10ZXh0XCI+SUVFRSBFZHVjYXRpb24gU29jaWV0eTwvaDI+XG4gICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cInNwYWNlLXktNCB0ZXh0LWdyYXktNzAwIGRhcms6dGV4dC1ncmF5LTMwMCBsZWFkaW5nLXJlbGF4ZWRcIj5cclxuICAgICAgICAgICAgICA8cD5cclxuICAgICAgICAgICAgICAgIElFRUUgRWR1Y2F0aW9uIFNvY2lldHkgKEVEUykgaXMgb25lIG9mIHRoZSBsYXJnZXN0IHRlY2huaWNhbCBzb2NpZXRpZXMgd2l0aGluIElFRUUsIGRlZGljYXRlZCB0byBhZHZhbmNpbmcgZWR1Y2F0aW9uIGFuZCB0ZWNobm9sb2d5LiBXaXRoIGEgcmljaCBoaXN0b3J5IHNwYW5uaW5nIHNldmVyYWwgZGVjYWRlcywgRURTIGhhcyBiZWNvbWUgdGhlIHByZW1pZXIgb3JnYW5pemF0aW9uIGZvciBlZHVjYXRvcnMsIHN0dWRlbnRzLCBhbmQgcHJvZmVzc2lvbmFscyBpbiB0aGUgZmllbGQgb2YgdGVjaG5vbG9neSBhbmQgZW5naW5lZXJpbmcgZWR1Y2F0aW9uLlxuICAgICAgICAgICAgICA8L3A+XHJcbiAgICAgICAgICAgICAgPHA+XHJcbiAgICAgICAgICAgICAgICBPdXIgZ2xvYmFsIG5ldHdvcmsgaW5jbHVkZXMgb3ZlciA0MDAsMDAwIG1lbWJlcnMgYWNyb3NzIDE2MCBjb3VudHJpZXMsIHVuaXRlZCBieSBhIHBhc3Npb24gZm9yIGlubm92YXRpb24sIGtub3dsZWRnZSBzaGFyaW5nLCBhbmQgcHJvZmVzc2lvbmFsIGRldmVsb3BtZW50LlxyXG4gICAgICAgICAgICAgIDwvcD5cclxuICAgICAgICAgICAgICA8cD5cclxuICAgICAgICAgICAgICAgIElFRUUgRURTIGZvY3VzZXMgb24gdmFyaW91cyBkb21haW5zIGluY2x1ZGluZzpcclxuICAgICAgICAgICAgICA8L3A+XHJcbiAgICAgICAgICAgICAgPHVsIGNsYXNzTmFtZT1cImxpc3QtZGlzYyBsaXN0LWluc2lkZSBzcGFjZS15LTIgcGwtNFwiPlxyXG4gICAgICAgICAgICAgICAgPGxpPkVuZ2luZWVyaW5nIEVkdWNhdGlvbjwvbGk+XHJcbiAgICAgICAgICAgICAgICA8bGk+RWR1Y2F0aW9uYWwgVGVjaG5vbG9neTwvbGk+XHJcbiAgICAgICAgICAgICAgICA8bGk+UHJvZmVzc2lvbmFsIERldmVsb3BtZW50PC9saT5cclxuICAgICAgICAgICAgICAgIDxsaT5TdHVkZW50IE1lbnRvcnNoaXA8L2xpPlxyXG4gICAgICAgICAgICAgICAgPGxpPlJlc2VhcmNoIGFuZCBJbm5vdmF0aW9uPC9saT5cclxuICAgICAgICAgICAgICA8L3VsPlxyXG4gICAgICAgICAgICA8L2Rpdj5cclxuICAgICAgICAgIDwvbW90aW9uLmRpdj5cclxuXHJcbiAgICAgICAgICB7LyogU3R1ZGVudCBCcmFuY2ggQ2hhcHRlciBTZWN0aW9uICovfVxyXG4gICAgICAgICAgPG1vdGlvbi5kaXZcclxuICAgICAgICAgICAgY2xhc3NOYW1lPVwiZ2xhc3Ntb3JwaGlzbSBwLTEyIHJvdW5kZWQtMnhsXCJcclxuICAgICAgICAgICAgaW5pdGlhbD17eyBvcGFjaXR5OiAwLCB5OiAyMCB9fVxyXG4gICAgICAgICAgICB3aGlsZUluVmlldz17eyBvcGFjaXR5OiAxLCB5OiAwIH19XHJcbiAgICAgICAgICAgIHRyYW5zaXRpb249e3sgZHVyYXRpb246IDAuNiwgZGVsYXk6IDAuMSB9fVxyXG4gICAgICAgICAgICB2aWV3cG9ydD17eyBvbmNlOiB0cnVlIH19XHJcbiAgICAgICAgICA+XHJcbiAgICAgICAgICAgIDxoMiBjbGFzc05hbWU9XCJ0ZXh0LTN4bCBmb250LWJvbGQgbWItNiBncmFkaWVudC10ZXh0XCI+T3VyIFN0dWRlbnQgQnJhbmNoIENoYXB0ZXI8L2gyPlxyXG4gICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cInNwYWNlLXktNCB0ZXh0LWdyYXktNzAwIGRhcms6dGV4dC1ncmF5LTMwMCBsZWFkaW5nLXJlbGF4ZWRcIj5cclxuICAgICAgICAgICAgICA8cD5cclxuICAgICAgICAgICAgICAgIE91ciBTdHVkZW50IEJyYW5jaCBDaGFwdGVyIHNlcnZlcyBhcyBhIHZpYnJhbnQgaHViIGZvciBzdHVkZW50cyBwYXNzaW9uYXRlIGFib3V0IHRlY2hub2xvZ3kgYW5kIGVkdWNhdGlvbi4gV2UgYXJlIGNvbW1pdHRlZCB0byBicmlkZ2luZyB0aGUgZ2FwIGJldHdlZW4gYWNhZGVtaWMgbGVhcm5pbmcgYW5kIGluZHVzdHJ5IHByYWN0aWNlcy5cclxuICAgICAgICAgICAgICA8L3A+XHJcbiAgICAgICAgICAgICAgPHA+XHJcbiAgICAgICAgICAgICAgICBUaHJvdWdoIG91ciBjaGFwdGVyLCBzdHVkZW50cyBnZXQgZXhwb3N1cmUgdG86XHJcbiAgICAgICAgICAgICAgPC9wPlxyXG4gICAgICAgICAgICAgIDx1bCBjbGFzc05hbWU9XCJsaXN0LWRpc2MgbGlzdC1pbnNpZGUgc3BhY2UteS0yIHBsLTRcIj5cclxuICAgICAgICAgICAgICAgIDxsaT5UZWNobmljYWwgd29ya3Nob3BzIGFuZCBoYW5kcy1vbiB0cmFpbmluZzwvbGk+XHJcbiAgICAgICAgICAgICAgICA8bGk+TmV0d29ya2luZyB3aXRoIGluZHVzdHJ5IHByb2Zlc3Npb25hbHM8L2xpPlxyXG4gICAgICAgICAgICAgICAgPGxpPk1lbnRvcnNoaXAgZnJvbSBleHBlcmllbmNlZCBmYWN1bHR5IGFuZCBlbmdpbmVlcnM8L2xpPlxyXG4gICAgICAgICAgICAgICAgPGxpPlBhcnRpY2lwYXRpb24gaW4gaGFja2F0aG9ucyBhbmQgY29tcGV0aXRpb25zPC9saT5cclxuICAgICAgICAgICAgICAgIDxsaT5MZWFkZXJzaGlwIGFuZCB0ZWFtIGRldmVsb3BtZW50IG9wcG9ydHVuaXRpZXM8L2xpPlxyXG4gICAgICAgICAgICAgICAgPGxpPkNhcmVlciBndWlkYW5jZSBhbmQgcGxhY2VtZW50IGFzc2lzdGFuY2U8L2xpPlxyXG4gICAgICAgICAgICAgIDwvdWw+XHJcbiAgICAgICAgICAgIDwvZGl2PlxyXG4gICAgICAgICAgPC9tb3Rpb24uZGl2PlxyXG5cclxuICAgICAgICAgIHsvKiBWaXNpb24gJiBNaXNzaW9uIFNlY3Rpb24gKi99XHJcbiAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImdyaWQgbWQ6Z3JpZC1jb2xzLTIgZ2FwLThcIj5cclxuICAgICAgICAgICAgPG1vdGlvbi5kaXZcclxuICAgICAgICAgICAgICBjbGFzc05hbWU9XCJnbGFzc21vcnBoaXNtIHAtOCByb3VuZGVkLTJ4bFwiXHJcbiAgICAgICAgICAgICAgaW5pdGlhbD17eyBvcGFjaXR5OiAwLCB4OiAtMjAgfX1cclxuICAgICAgICAgICAgICB3aGlsZUluVmlldz17eyBvcGFjaXR5OiAxLCB4OiAwIH19XHJcbiAgICAgICAgICAgICAgdHJhbnNpdGlvbj17eyBkdXJhdGlvbjogMC42IH19XHJcbiAgICAgICAgICAgICAgdmlld3BvcnQ9e3sgb25jZTogdHJ1ZSB9fVxyXG4gICAgICAgICAgICA+XHJcbiAgICAgICAgICAgICAgPGgzIGNsYXNzTmFtZT1cInRleHQtMnhsIGZvbnQtYm9sZCBtYi00IHRleHQtYmx1ZS02MDBcIj5WaXNpb248L2gzPlxyXG4gICAgICAgICAgICAgIDxwIGNsYXNzTmFtZT1cInRleHQtZ3JheS03MDAgZGFyazp0ZXh0LWdyYXktMzAwIGxlYWRpbmctcmVsYXhlZFwiPlxyXG4gICAgICAgICAgICAgICAgVG8gaW5zcGlyZSBhbmQgZW1wb3dlciBhIGdsb2JhbCBjb21tdW5pdHkgb2YgbGVhcm5lcnMgdG8gaW5ub3ZhdGUsIGxlYWQsIGFuZCBjcmVhdGUgcG9zaXRpdmUgY2hhbmdlIHRocm91Z2ggdGVjaG5vbG9neSBhbmQgZWR1Y2F0aW9uLlxyXG4gICAgICAgICAgICAgIDwvcD5cclxuICAgICAgICAgICAgPC9tb3Rpb24uZGl2PlxyXG5cclxuICAgICAgICAgICAgPG1vdGlvbi5kaXZcclxuICAgICAgICAgICAgICBjbGFzc05hbWU9XCJnbGFzc21vcnBoaXNtIHAtOCByb3VuZGVkLTJ4bFwiXHJcbiAgICAgICAgICAgICAgaW5pdGlhbD17eyBvcGFjaXR5OiAwLCB4OiAyMCB9fVxyXG4gICAgICAgICAgICAgIHdoaWxlSW5WaWV3PXt7IG9wYWNpdHk6IDEsIHg6IDAgfX1cclxuICAgICAgICAgICAgICB0cmFuc2l0aW9uPXt7IGR1cmF0aW9uOiAwLjYgfX1cclxuICAgICAgICAgICAgICB2aWV3cG9ydD17eyBvbmNlOiB0cnVlIH19XHJcbiAgICAgICAgICAgID5cclxuICAgICAgICAgICAgICA8aDMgY2xhc3NOYW1lPVwidGV4dC0yeGwgZm9udC1ib2xkIG1iLTQgdGV4dC1jeWFuLTYwMFwiPk1pc3Npb248L2gzPlxyXG4gICAgICAgICAgICAgIDxwIGNsYXNzTmFtZT1cInRleHQtZ3JheS03MDAgZGFyazp0ZXh0LWdyYXktMzAwIGxlYWRpbmctcmVsYXhlZFwiPlxyXG4gICAgICAgICAgICAgICAgVG8gcHJvdmlkZSB3b3JsZC1jbGFzcyB0ZWNobmljYWwgZWR1Y2F0aW9uLCBmb3N0ZXIgaW5ub3ZhdGlvbiwgZGV2ZWxvcCBmdXR1cmUgbGVhZGVycywgYW5kIGNyZWF0ZSBzdXN0YWluYWJsZSBpbXBhY3QgdGhyb3VnaCB0ZWNobm9sb2d5IGFuZCBrbm93bGVkZ2Ugc2hhcmluZy5cclxuICAgICAgICAgICAgICA8L3A+XHJcbiAgICAgICAgICAgIDwvbW90aW9uLmRpdj5cclxuICAgICAgICAgIDwvZGl2PlxyXG5cclxuICAgICAgICAgIHsvKiBDb3JlIFZhbHVlcyAqL31cclxuICAgICAgICAgIDxtb3Rpb24uZGl2XHJcbiAgICAgICAgICAgIGNsYXNzTmFtZT1cImdsYXNzbW9ycGhpc20gcC0xMiByb3VuZGVkLTJ4bFwiXHJcbiAgICAgICAgICAgIGluaXRpYWw9e3sgb3BhY2l0eTogMCwgeTogMjAgfX1cclxuICAgICAgICAgICAgd2hpbGVJblZpZXc9e3sgb3BhY2l0eTogMSwgeTogMCB9fVxyXG4gICAgICAgICAgICB0cmFuc2l0aW9uPXt7IGR1cmF0aW9uOiAwLjYsIGRlbGF5OiAwLjIgfX1cclxuICAgICAgICAgICAgdmlld3BvcnQ9e3sgb25jZTogdHJ1ZSB9fVxyXG4gICAgICAgICAgPlxyXG4gICAgICAgICAgICA8aDMgY2xhc3NOYW1lPVwidGV4dC0zeGwgZm9udC1ib2xkIG1iLTggZ3JhZGllbnQtdGV4dFwiPk91ciBDb3JlIFZhbHVlczwvaDM+XHJcbiAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZ3JpZCBtZDpncmlkLWNvbHMtMiBnYXAtNlwiPlxyXG4gICAgICAgICAgICAgIHtbXHJcbiAgICAgICAgICAgICAgICB7IHRpdGxlOiAnRXhjZWxsZW5jZScsIGRlc2M6ICdXZSBzdHJpdmUgZm9yIHRoZSBoaWdoZXN0IHN0YW5kYXJkcyBpbiBldmVyeXRoaW5nIHdlIGRvLicgfSxcclxuICAgICAgICAgICAgICAgIHsgdGl0bGU6ICdJbm5vdmF0aW9uJywgZGVzYzogJ1dlIGVtYnJhY2UgbmV3IGlkZWFzIGFuZCBjcmVhdGl2ZSBzb2x1dGlvbnMuJyB9LFxyXG4gICAgICAgICAgICAgICAgeyB0aXRsZTogJ0NvbGxhYm9yYXRpb24nLCBkZXNjOiAnV2UgYmVsaWV2ZSBpbiB0aGUgcG93ZXIgb2YgdGVhbXdvcmsgYW5kIGtub3dsZWRnZSBzaGFyaW5nLicgfSxcclxuICAgICAgICAgICAgICAgIHsgdGl0bGU6ICdJbnRlZ3JpdHknLCBkZXNjOiAnV2UgdXBob2xkIGV0aGljYWwgcHJpbmNpcGxlcyBpbiBhbGwgb3VyIGFjdGlvbnMuJyB9LFxyXG4gICAgICAgICAgICAgICAgeyB0aXRsZTogJ0luY2x1c2l2aXR5JywgZGVzYzogJ1dlIHdlbGNvbWUgZGl2ZXJzZSBwZXJzcGVjdGl2ZXMgYW5kIGNyZWF0ZSBpbmNsdXNpdmUgY29tbXVuaXRpZXMuJyB9LFxyXG4gICAgICAgICAgICAgICAgeyB0aXRsZTogJ0ltcGFjdCcsIGRlc2M6ICdXZSBmb2N1cyBvbiBjcmVhdGluZyBtZWFuaW5nZnVsIGFuZCBsYXN0aW5nIHBvc2l0aXZlIGNoYW5nZS4nIH1cclxuICAgICAgICAgICAgICBdLm1hcCgodmFsdWUsIGkpID0+IChcclxuICAgICAgICAgICAgICAgIDxkaXYga2V5PXtpfSBjbGFzc05hbWU9XCJwLTQgYmctd2hpdGUvNSByb3VuZGVkLWxnIGJvcmRlciBib3JkZXItd2hpdGUvMTBcIj5cclxuICAgICAgICAgICAgICAgICAgPGg0IGNsYXNzTmFtZT1cImZvbnQtYm9sZCB0ZXh0LWxnIG1iLTJcIj57dmFsdWUudGl0bGV9PC9oND5cclxuICAgICAgICAgICAgICAgICAgPHAgY2xhc3NOYW1lPVwidGV4dC1zbSB0ZXh0LWdyYXktNjAwIGRhcms6dGV4dC1ncmF5LTQwMFwiPnt2YWx1ZS5kZXNjfTwvcD5cclxuICAgICAgICAgICAgICAgIDwvZGl2PlxyXG4gICAgICAgICAgICAgICkpfVxyXG4gICAgICAgICAgICA8L2Rpdj5cclxuICAgICAgICAgIDwvbW90aW9uLmRpdj5cclxuICAgICAgICA8L2Rpdj5cclxuICAgICAgPC9zZWN0aW9uPlxyXG4gICAgPC9kaXY+XHJcbiAgKTtcclxufVxyXG4iXSwiZmlsZSI6IkM6L1VzZXJzL2tvdGlyL09uZURyaXZlL0Rlc2t0b3AvSUVFRS9jbGllbnQvc3JjL3BhZ2VzL0Fib3V0LmpzeCJ9

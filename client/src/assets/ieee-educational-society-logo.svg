@@ -1,0 +1,18 @@
+<svg width="420" height="120" viewBox="0 0 420 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="420" height="120" rx="24" fill="transparent"/>
+  <text x="10" y="52" fill="#F47C20" font-family="Arial, Helvetica, sans-serif" font-size="34" font-weight="700" letter-spacing="1">IEEE</text>
+  <g transform="translate(105,10)">
+    <path d="M25 46C42 30 55 18 67 12C62 24 55 34 48 42C42 42 35 43 25 46Z" fill="#F47C20"/>
+    <path d="M66 12C74 20 81 30 86 42C75 40 68 40 61 40C63 31 64 22 66 12Z" fill="#1D3574"/>
+    <path d="M33 50C50 50 66 51 82 54C72 45 60 38 48 34C43 38 38 43 33 50Z" fill="#1D3574"/>
+    <path d="M83 54C99 52 118 52 138 54C128 45 116 38 103 34C95 39 89 45 83 54Z" fill="#1D3574"/>
+    <path d="M138 54C152 54 166 55 180 58C169 46 156 37 144 33C141 41 139 48 138 54Z" fill="#1D3574"/>
+    <path d="M85 28C100 15 117 8 136 8" stroke="#F47C20" stroke-width="4.5" stroke-linecap="round"/>
+    <path d="M92 35C111 18 130 13 149 14" stroke="#1D3574" stroke-width="4.5" stroke-linecap="round"/>
+    <circle cx="138" cy="8" r="4.5" fill="#F47C20"/>
+    <circle cx="150" cy="14" r="4.5" fill="#1D3574"/>
+    <path d="M133 20C149 26 162 37 171 52" stroke="#1D3574" stroke-width="3.5" stroke-linecap="round"/>
+    <path d="M171 52C175 58 178 65 180 72" stroke="#1D3574" stroke-width="3.5" stroke-linecap="round"/>
+  </g>
+  <text x="10" y="98" fill="#1D3574" font-family="Arial, Helvetica, sans-serif" font-size="34" font-weight="700">Education Society</text>
+</svg>

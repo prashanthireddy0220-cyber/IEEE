@@ -1,0 +1,5 @@
+2026/06/22-09:43:00.001 3c84 Creating DB C:\Users\kotir\OneDrive\Desktop\IEEE\.edge-test\Default\EdgeCoupons/coupons_data.db since it was missing.
+2026/06/22-09:43:00.066 3c84 Reusing MANIFEST C:\Users\kotir\OneDrive\Desktop\IEEE\.edge-test\Default\EdgeCoupons/coupons_data.db/MANIFEST-000001
+2026/06/22-09:43:07.586 dd0 Level-0 table #5: started
+2026/06/22-09:43:07.593 dd0 Level-0 table #5: 682681 bytes OK
+2026/06/22-09:43:07.597 dd0 Delete type=0 #3

@@ -1,0 +1,482 @@
+import { createHotContext as __vite__createHotContext } from "/@vite/client";import.meta.hot = __vite__createHotContext("/src/components/Dashboard/EventsManager.jsx");import __vite__cjsImport0_react_jsxDevRuntime from "/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=722ab6a6"; const jsxDEV = __vite__cjsImport0_react_jsxDevRuntime["jsxDEV"];
+import * as RefreshRuntime from "/@react-refresh";
+const inWebWorker = typeof WorkerGlobalScope !== "undefined" && self instanceof WorkerGlobalScope;
+let prevRefreshReg;
+let prevRefreshSig;
+if (import.meta.hot && !inWebWorker) {
+  if (!window.$RefreshReg$) {
+    throw new Error(
+      "@vitejs/plugin-react can't detect preamble. Something is wrong."
+    );
+  }
+  prevRefreshReg = window.$RefreshReg$;
+  prevRefreshSig = window.$RefreshSig$;
+  window.$RefreshReg$ = RefreshRuntime.getRefreshReg("C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/components/Dashboard/EventsManager.jsx");
+  window.$RefreshSig$ = RefreshRuntime.createSignatureFunctionForTransform;
+}
+var _s = $RefreshSig$();
+import __vite__cjsImport3_react from "/node_modules/.vite/deps/react.js?v=722ab6a6"; const React = __vite__cjsImport3_react.__esModule ? __vite__cjsImport3_react.default : __vite__cjsImport3_react; const useState = __vite__cjsImport3_react["useState"]; const useEffect = __vite__cjsImport3_react["useEffect"];
+import { motion } from "/node_modules/.vite/deps/framer-motion.js?v=722ab6a6";
+import axios from "/node_modules/.vite/deps/axios.js?v=722ab6a6";
+import { FiEdit2, FiTrash2, FiPlus } from "/node_modules/.vite/deps/react-icons_fi.js?v=722ab6a6";
+import { useAuth } from "/src/context/AuthContext.jsx";
+export default function EventsManager() {
+  _s();
+  const { user } = useAuth();
+  const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [showForm, setShowForm] = useState(false);
+  const [formData, setFormData] = useState({
+    title: "",
+    description: "",
+    date: "",
+    time: "",
+    venue: "",
+    category: "workshop",
+    registrationLink: ""
+  });
+  const canManageEvents = ["chairman", "core-team", "student-chairperson"].includes(user?.role);
+  useEffect(() => {
+    fetchEvents();
+  }, []);
+  const fetchEvents = async () => {
+    try {
+      const res = await axios.get("/api/events");
+      setEvents(res.data);
+    } catch (error) {
+      console.error("Error fetching events:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await axios.post("/api/events", formData);
+      setEvents([res.data, ...events]);
+      setFormData({
+        title: "",
+        description: "",
+        date: "",
+        time: "",
+        venue: "",
+        category: "workshop",
+        registrationLink: ""
+      });
+      setShowForm(false);
+    } catch (error) {
+      console.error("Error creating event:", error);
+    }
+  };
+  const handleDelete = async (id) => {
+    if (confirm("Are you sure you want to delete this event?")) {
+      try {
+        await axios.delete(`/api/events/${id}`);
+        setEvents(events.filter((event) => event._id !== id));
+      } catch (error) {
+        console.error("Error deleting event:", error);
+      }
+    }
+  };
+  return /* @__PURE__ */ jsxDEV("div", { className: "space-y-8", children: [
+    /* @__PURE__ */ jsxDEV("div", { className: "flex items-center justify-between", children: [
+      /* @__PURE__ */ jsxDEV("div", { children: [
+        /* @__PURE__ */ jsxDEV("h2", { className: "text-3xl font-bold", children: "Events Manager" }, void 0, false, {
+          fileName: "C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/components/Dashboard/EventsManager.jsx",
+          lineNumber: 93,
+          columnNumber: 11
+        }, this),
+        /* @__PURE__ */ jsxDEV("p", { className: "text-gray-600 dark:text-gray-400", children: canManageEvents ? "Create and manage events" : "Browse chapter events and stay updated" }, void 0, false, {
+          fileName: "C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/components/Dashboard/EventsManager.jsx",
+          lineNumber: 94,
+          columnNumber: 11
+        }, this)
+      ] }, void 0, true, {
+        fileName: "C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/components/Dashboard/EventsManager.jsx",
+        lineNumber: 92,
+        columnNumber: 9
+      }, this),
+      canManageEvents && /* @__PURE__ */ jsxDEV(
+        "button",
+        {
+          onClick: () => setShowForm(!showForm),
+          className: "btn btn-primary flex items-center gap-2",
+          children: [
+            /* @__PURE__ */ jsxDEV(FiPlus, {}, void 0, false, {
+              fileName: "C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/components/Dashboard/EventsManager.jsx",
+              lineNumber: 103,
+              columnNumber: 13
+            }, this),
+            "New Event"
+          ]
+        },
+        void 0,
+        true,
+        {
+          fileName: "C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/components/Dashboard/EventsManager.jsx",
+          lineNumber: 99,
+          columnNumber: 9
+        },
+        this
+      )
+    ] }, void 0, true, {
+      fileName: "C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/components/Dashboard/EventsManager.jsx",
+      lineNumber: 91,
+      columnNumber: 7
+    }, this),
+    canManageEvents && showForm && /* @__PURE__ */ jsxDEV(
+      motion.div,
+      {
+        className: "glassmorphism rounded-2xl p-8",
+        initial: { opacity: 0, y: -20 },
+        animate: { opacity: 1, y: 0 },
+        children: [
+          /* @__PURE__ */ jsxDEV("h3", { className: "mb-6 text-xl font-bold", children: "Create New Event" }, void 0, false, {
+            fileName: "C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/components/Dashboard/EventsManager.jsx",
+            lineNumber: 115,
+            columnNumber: 11
+          }, this),
+          /* @__PURE__ */ jsxDEV("form", { onSubmit: handleSubmit, className: "space-y-4", children: [
+            /* @__PURE__ */ jsxDEV("div", { className: "grid gap-4 md:grid-cols-2", children: [
+              /* @__PURE__ */ jsxDEV(
+                "input",
+                {
+                  type: "text",
+                  placeholder: "Event Title",
+                  value: formData.title,
+                  onChange: (e) => setFormData({ ...formData, title: e.target.value }),
+                  required: true,
+                  className: "rounded-lg border border-white/10 bg-white/5 px-4 py-2 focus:border-blue-600 focus:outline-none"
+                },
+                void 0,
+                false,
+                {
+                  fileName: "C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/components/Dashboard/EventsManager.jsx",
+                  lineNumber: 118,
+                  columnNumber: 15
+                },
+                this
+              ),
+              /* @__PURE__ */ jsxDEV(
+                "select",
+                {
+                  value: formData.category,
+                  onChange: (e) => setFormData({ ...formData, category: e.target.value }),
+                  className: "rounded-lg border border-white/10 bg-slate-900/80 px-4 py-2 text-white focus:border-blue-600 focus:outline-none",
+                  children: [
+                    /* @__PURE__ */ jsxDEV("option", { value: "workshop", className: "bg-slate-900 text-white", children: "Workshop" }, void 0, false, {
+                      fileName: "C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/components/Dashboard/EventsManager.jsx",
+                      lineNumber: 131,
+                      columnNumber: 17
+                    }, this),
+                    /* @__PURE__ */ jsxDEV("option", { value: "seminar", className: "bg-slate-900 text-white", children: "Seminar" }, void 0, false, {
+                      fileName: "C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/components/Dashboard/EventsManager.jsx",
+                      lineNumber: 132,
+                      columnNumber: 17
+                    }, this),
+                    /* @__PURE__ */ jsxDEV("option", { value: "hackathon", className: "bg-slate-900 text-white", children: "Hackathon" }, void 0, false, {
+                      fileName: "C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/components/Dashboard/EventsManager.jsx",
+                      lineNumber: 133,
+                      columnNumber: 17
+                    }, this),
+                    /* @__PURE__ */ jsxDEV("option", { value: "competition", className: "bg-slate-900 text-white", children: "Competition" }, void 0, false, {
+                      fileName: "C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/components/Dashboard/EventsManager.jsx",
+                      lineNumber: 134,
+                      columnNumber: 17
+                    }, this),
+                    /* @__PURE__ */ jsxDEV("option", { value: "meetup", className: "bg-slate-900 text-white", children: "Meetup" }, void 0, false, {
+                      fileName: "C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/components/Dashboard/EventsManager.jsx",
+                      lineNumber: 135,
+                      columnNumber: 17
+                    }, this)
+                  ]
+                },
+                void 0,
+                true,
+                {
+                  fileName: "C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/components/Dashboard/EventsManager.jsx",
+                  lineNumber: 126,
+                  columnNumber: 15
+                },
+                this
+              ),
+              /* @__PURE__ */ jsxDEV(
+                "input",
+                {
+                  type: "datetime-local",
+                  value: formData.date,
+                  onChange: (e) => setFormData({ ...formData, date: e.target.value }),
+                  required: true,
+                  className: "rounded-lg border border-white/10 bg-white/5 px-4 py-2 focus:border-blue-600 focus:outline-none"
+                },
+                void 0,
+                false,
+                {
+                  fileName: "C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/components/Dashboard/EventsManager.jsx",
+                  lineNumber: 137,
+                  columnNumber: 15
+                },
+                this
+              ),
+              /* @__PURE__ */ jsxDEV(
+                "input",
+                {
+                  type: "text",
+                  placeholder: "Venue",
+                  value: formData.venue,
+                  onChange: (e) => setFormData({ ...formData, venue: e.target.value }),
+                  className: "rounded-lg border border-white/10 bg-white/5 px-4 py-2 focus:border-blue-600 focus:outline-none"
+                },
+                void 0,
+                false,
+                {
+                  fileName: "C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/components/Dashboard/EventsManager.jsx",
+                  lineNumber: 144,
+                  columnNumber: 15
+                },
+                this
+              ),
+              /* @__PURE__ */ jsxDEV(
+                "input",
+                {
+                  type: "url",
+                  placeholder: "Registration Link",
+                  value: formData.registrationLink,
+                  onChange: (e) => setFormData({ ...formData, registrationLink: e.target.value }),
+                  className: "rounded-lg border border-white/10 bg-white/5 px-4 py-2 focus:border-blue-600 focus:outline-none md:col-span-2"
+                },
+                void 0,
+                false,
+                {
+                  fileName: "C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/components/Dashboard/EventsManager.jsx",
+                  lineNumber: 151,
+                  columnNumber: 15
+                },
+                this
+              )
+            ] }, void 0, true, {
+              fileName: "C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/components/Dashboard/EventsManager.jsx",
+              lineNumber: 117,
+              columnNumber: 13
+            }, this),
+            /* @__PURE__ */ jsxDEV(
+              "textarea",
+              {
+                placeholder: "Event Description",
+                value: formData.description,
+                onChange: (e) => setFormData({ ...formData, description: e.target.value }),
+                required: true,
+                rows: "4",
+                className: "w-full resize-none rounded-lg border border-white/10 bg-white/5 px-4 py-2 focus:border-blue-600 focus:outline-none"
+              },
+              void 0,
+              false,
+              {
+                fileName: "C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/components/Dashboard/EventsManager.jsx",
+                lineNumber: 159,
+                columnNumber: 13
+              },
+              this
+            ),
+            /* @__PURE__ */ jsxDEV("div", { className: "flex gap-4", children: [
+              /* @__PURE__ */ jsxDEV("button", { type: "submit", className: "btn btn-primary", children: "Create Event" }, void 0, false, {
+                fileName: "C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/components/Dashboard/EventsManager.jsx",
+                lineNumber: 168,
+                columnNumber: 15
+              }, this),
+              /* @__PURE__ */ jsxDEV(
+                "button",
+                {
+                  type: "button",
+                  onClick: () => setShowForm(false),
+                  className: "btn btn-outline",
+                  children: "Cancel"
+                },
+                void 0,
+                false,
+                {
+                  fileName: "C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/components/Dashboard/EventsManager.jsx",
+                  lineNumber: 169,
+                  columnNumber: 15
+                },
+                this
+              )
+            ] }, void 0, true, {
+              fileName: "C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/components/Dashboard/EventsManager.jsx",
+              lineNumber: 167,
+              columnNumber: 13
+            }, this)
+          ] }, void 0, true, {
+            fileName: "C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/components/Dashboard/EventsManager.jsx",
+            lineNumber: 116,
+            columnNumber: 11
+          }, this)
+        ]
+      },
+      void 0,
+      true,
+      {
+        fileName: "C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/components/Dashboard/EventsManager.jsx",
+        lineNumber: 110,
+        columnNumber: 7
+      },
+      this
+    ),
+    /* @__PURE__ */ jsxDEV("div", { className: "space-y-4", children: loading ? /* @__PURE__ */ jsxDEV("div", { className: "py-8 text-center", children: /* @__PURE__ */ jsxDEV("div", { className: "inline-block h-8 w-8 animate-spin rounded-full border-t-2 border-b-2 border-blue-600" }, void 0, false, {
+      fileName: "C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/components/Dashboard/EventsManager.jsx",
+      lineNumber: 184,
+      columnNumber: 13
+    }, this) }, void 0, false, {
+      fileName: "C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/components/Dashboard/EventsManager.jsx",
+      lineNumber: 183,
+      columnNumber: 9
+    }, this) : events.length > 0 ? events.map(
+      (event, idx) => /* @__PURE__ */ jsxDEV(
+        motion.div,
+        {
+          className: "glassmorphism flex items-start justify-between rounded-xl p-6",
+          initial: { opacity: 0, y: 20 },
+          animate: { opacity: 1, y: 0 },
+          transition: { delay: idx * 0.1 },
+          children: [
+            /* @__PURE__ */ jsxDEV("div", { className: "flex-1", children: [
+              /* @__PURE__ */ jsxDEV("h3", { className: "mb-2 text-lg font-bold", children: event.title }, void 0, false, {
+                fileName: "C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/components/Dashboard/EventsManager.jsx",
+                lineNumber: 196,
+                columnNumber: 17
+              }, this),
+              /* @__PURE__ */ jsxDEV("div", { className: "flex flex-wrap gap-3 text-sm text-gray-600 dark:text-gray-400", children: [
+                /* @__PURE__ */ jsxDEV("span", { children: `Date: ${new Date(event.date).toLocaleDateString()}` }, void 0, false, {
+                  fileName: "C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/components/Dashboard/EventsManager.jsx",
+                  lineNumber: 198,
+                  columnNumber: 19
+                }, this),
+                /* @__PURE__ */ jsxDEV("span", { children: `Venue: ${event.venue || "Online"}` }, void 0, false, {
+                  fileName: "C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/components/Dashboard/EventsManager.jsx",
+                  lineNumber: 199,
+                  columnNumber: 19
+                }, this),
+                /* @__PURE__ */ jsxDEV("span", { className: "capitalize", children: `Category: ${event.category}` }, void 0, false, {
+                  fileName: "C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/components/Dashboard/EventsManager.jsx",
+                  lineNumber: 200,
+                  columnNumber: 19
+                }, this)
+              ] }, void 0, true, {
+                fileName: "C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/components/Dashboard/EventsManager.jsx",
+                lineNumber: 197,
+                columnNumber: 17
+              }, this),
+              !canManageEvents && /* @__PURE__ */ jsxDEV("div", { className: "mt-4", children: event.registrationLink ? /* @__PURE__ */ jsxDEV(
+                "a",
+                {
+                  href: event.registrationLink,
+                  target: "_blank",
+                  rel: "noopener noreferrer",
+                  className: "btn btn-primary inline-flex",
+                  children: "Register Event"
+                },
+                void 0,
+                false,
+                {
+                  fileName: "C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/components/Dashboard/EventsManager.jsx",
+                  lineNumber: 205,
+                  columnNumber: 15
+                },
+                this
+              ) : /* @__PURE__ */ jsxDEV("div", { className: "text-sm text-gray-500 dark:text-gray-400", children: "Registration link will be available soon." }, void 0, false, {
+                fileName: "C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/components/Dashboard/EventsManager.jsx",
+                lineNumber: 214,
+                columnNumber: 15
+              }, this) }, void 0, false, {
+                fileName: "C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/components/Dashboard/EventsManager.jsx",
+                lineNumber: 203,
+                columnNumber: 13
+              }, this)
+            ] }, void 0, true, {
+              fileName: "C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/components/Dashboard/EventsManager.jsx",
+              lineNumber: 195,
+              columnNumber: 15
+            }, this),
+            canManageEvents && /* @__PURE__ */ jsxDEV("div", { className: "flex gap-2", children: [
+              /* @__PURE__ */ jsxDEV("button", { className: "rounded-lg p-2 transition-all hover:bg-blue-500/20", children: /* @__PURE__ */ jsxDEV(FiEdit2, { className: "text-blue-600" }, void 0, false, {
+                fileName: "C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/components/Dashboard/EventsManager.jsx",
+                lineNumber: 224,
+                columnNumber: 21
+              }, this) }, void 0, false, {
+                fileName: "C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/components/Dashboard/EventsManager.jsx",
+                lineNumber: 223,
+                columnNumber: 19
+              }, this),
+              /* @__PURE__ */ jsxDEV(
+                "button",
+                {
+                  onClick: () => handleDelete(event._id),
+                  className: "rounded-lg p-2 transition-all hover:bg-red-500/20",
+                  children: /* @__PURE__ */ jsxDEV(FiTrash2, { className: "text-red-600" }, void 0, false, {
+                    fileName: "C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/components/Dashboard/EventsManager.jsx",
+                    lineNumber: 230,
+                    columnNumber: 21
+                  }, this)
+                },
+                void 0,
+                false,
+                {
+                  fileName: "C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/components/Dashboard/EventsManager.jsx",
+                  lineNumber: 226,
+                  columnNumber: 19
+                },
+                this
+              )
+            ] }, void 0, true, {
+              fileName: "C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/components/Dashboard/EventsManager.jsx",
+              lineNumber: 222,
+              columnNumber: 11
+            }, this)
+          ]
+        },
+        event._id,
+        true,
+        {
+          fileName: "C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/components/Dashboard/EventsManager.jsx",
+          lineNumber: 188,
+          columnNumber: 9
+        },
+        this
+      )
+    ) : /* @__PURE__ */ jsxDEV("div", { className: "py-8 text-center text-gray-600 dark:text-gray-400", children: canManageEvents ? "No events yet. Create one to get started!" : "No events have been published yet." }, void 0, false, {
+      fileName: "C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/components/Dashboard/EventsManager.jsx",
+      lineNumber: 237,
+      columnNumber: 9
+    }, this) }, void 0, false, {
+      fileName: "C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/components/Dashboard/EventsManager.jsx",
+      lineNumber: 181,
+      columnNumber: 7
+    }, this)
+  ] }, void 0, true, {
+    fileName: "C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/components/Dashboard/EventsManager.jsx",
+    lineNumber: 90,
+    columnNumber: 5
+  }, this);
+}
+_s(EventsManager, "1ox3tvWLVUce2uRna85J/CNlvNk=", false, function() {
+  return [useAuth];
+});
+_c = EventsManager;
+var _c;
+$RefreshReg$(_c, "EventsManager");
+if (import.meta.hot && !inWebWorker) {
+  window.$RefreshReg$ = prevRefreshReg;
+  window.$RefreshSig$ = prevRefreshSig;
+}
+if (import.meta.hot && !inWebWorker) {
+  RefreshRuntime.__hmr_import(import.meta.url).then((currentExports) => {
+    RefreshRuntime.registerExportsForReactRefresh("C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/components/Dashboard/EventsManager.jsx", currentExports);
+    import.meta.hot.accept((nextExports) => {
+      if (!nextExports) return;
+      const invalidateMessage = RefreshRuntime.validateRefreshBoundaryAndEnqueueUpdate("C:/Users/kotir/OneDrive/Desktop/IEEE/client/src/components/Dashboard/EventsManager.jsx", currentExports, nextExports);
+      if (invalidateMessage) import.meta.hot.invalidate(invalidateMessage);
+    });
+  });
+}
+
+//# sourceMappingURL=data:application/json;base64,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QUFBQTtBQUFBO0FBQUEsV0E0REE7QUFBQSxPQXZKRjtBQUFBO0FBQUE7QUFBQTtBQUFBLFNBd0pBO0FBRUo7QUFBQ2pCLEdBMU51QkQsZUFBYTtBQUFBLFVBQ2xCRCxPQUFPO0FBQUE7QUFBQSxLQURGQztBQUFhLElBQUFnRDtBQUFBLGFBQUFBLElBQUEiLCJuYW1lcyI6WyJSZWFjdCIsInVzZVN0YXRlIiwidXNlRWZmZWN0IiwibW90aW9uIiwiYXhpb3MiLCJGaUVkaXQyIiwiRmlUcmFzaDIiLCJGaVBsdXMiLCJ1c2VBdXRoIiwiRXZlbnRzTWFuYWdlciIsIl9zIiwidXNlciIsImV2ZW50cyIsInNldEV2ZW50cyIsImxvYWRpbmciLCJzZXRMb2FkaW5nIiwic2hvd0Zvcm0iLCJzZXRTaG93Rm9ybSIsImZvcm1EYXRhIiwic2V0Rm9ybURhdGEiLCJ0aXRsZSIsImRlc2NyaXB0aW9uIiwiZGF0ZSIsInRpbWUiLCJ2ZW51ZSIsImNhdGVnb3J5IiwicmVnaXN0cmF0aW9uTGluayIsImNhbk1hbmFnZUV2ZW50cyIsImluY2x1ZGVzIiwicm9sZSIsImZldGNoRXZlbnRzIiwicmVzIiwiZ2V0IiwiZGF0YSIsImVycm9yIiwiY29uc29sZSIsImhhbmRsZVN1Ym1pdCIsImUiLCJwcmV2ZW50RGVmYXVsdCIsInBvc3QiLCJoYW5kbGVEZWxldGUiLCJpZCIsImNvbmZpcm0iLCJkZWxldGUiLCJmaWx0ZXIiLCJldmVudCIsIl9pZCIsIm9wYWNpdHkiLCJ5IiwidGFyZ2V0IiwidmFsdWUiLCJsZW5ndGgiLCJtYXAiLCJpZHgiLCJkZWxheSIsIkRhdGUiLCJ0b0xvY2FsZURhdGVTdHJpbmciLCJfYyJdLCJpZ25vcmVMaXN0IjpbXSwic291cmNlcyI6WyJFdmVudHNNYW5hZ2VyLmpzeCJdLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQgUmVhY3QsIHsgdXNlU3RhdGUsIHVzZUVmZmVjdCB9IGZyb20gJ3JlYWN0JztcbmltcG9ydCB7IG1vdGlvbiB9IGZyb20gJ2ZyYW1lci1tb3Rpb24nO1xuaW1wb3J0IGF4aW9zIGZyb20gJ2F4aW9zJztcbmltcG9ydCB7IEZpRWRpdDIsIEZpVHJhc2gyLCBGaVBsdXMgfSBmcm9tICdyZWFjdC1pY29ucy9maSc7XG5pbXBvcnQgeyB1c2VBdXRoIH0gZnJvbSAnLi4vLi4vY29udGV4dC9BdXRoQ29udGV4dCc7XG5cbmV4cG9ydCBkZWZhdWx0IGZ1bmN0aW9uIEV2ZW50c01hbmFnZXIoKSB7XG4gIGNvbnN0IHsgdXNlciB9ID0gdXNlQXV0aCgpO1xuICBjb25zdCBbZXZlbnRzLCBzZXRFdmVudHNdID0gdXNlU3RhdGUoW10pO1xuICBjb25zdCBbbG9hZGluZywgc2V0TG9hZGluZ10gPSB1c2VTdGF0ZSh0cnVlKTtcbiAgY29uc3QgW3Nob3dGb3JtLCBzZXRTaG93Rm9ybV0gPSB1c2VTdGF0ZShmYWxzZSk7XG4gIGNvbnN0IFtmb3JtRGF0YSwgc2V0Rm9ybURhdGFdID0gdXNlU3RhdGUoe1xuICAgIHRpdGxlOiAnJyxcbiAgICBkZXNjcmlwdGlvbjogJycsXG4gICAgZGF0ZTogJycsXG4gICAgdGltZTogJycsXG4gICAgdmVudWU6ICcnLFxuICAgIGNhdGVnb3J5OiAnd29ya3Nob3AnLFxuICAgIHJlZ2lzdHJhdGlvbkxpbms6ICcnXG4gIH0pO1xuXG4gIGNvbnN0IGNhbk1hbmFnZUV2ZW50cyA9IFsnY2hhaXJtYW4nLCAnY29yZS10ZWFtJywgJ3N0dWRlbnQtY2hhaXJwZXJzb24nXS5pbmNsdWRlcyh1c2VyPy5yb2xlKTtcblxuICB1c2VFZmZlY3QoKCkgPT4ge1xuICAgIGZldGNoRXZlbnRzKCk7XG4gIH0sIFtdKTtcblxuICBjb25zdCBmZXRjaEV2ZW50cyA9IGFzeW5jICgpID0+IHtcbiAgICB0cnkge1xuICAgICAgY29uc3QgcmVzID0gYXdhaXQgYXhpb3MuZ2V0KCcvYXBpL2V2ZW50cycpO1xuICAgICAgc2V0RXZlbnRzKHJlcy5kYXRhKTtcbiAgICB9IGNhdGNoIChlcnJvcikge1xuICAgICAgY29uc29sZS5lcnJvcignRXJyb3IgZmV0Y2hpbmcgZXZlbnRzOicsIGVycm9yKTtcbiAgICB9IGZpbmFsbHkge1xuICAgICAgc2V0TG9hZGluZyhmYWxzZSk7XG4gICAgfVxuICB9O1xuXG4gIGNvbnN0IGhhbmRsZVN1Ym1pdCA9IGFzeW5jIChlKSA9PiB7XG4gICAgZS5wcmV2ZW50RGVmYXVsdCgpO1xuICAgIHRyeSB7XG4gICAgICBjb25zdCByZXMgPSBhd2FpdCBheGlvcy5wb3N0KCcvYXBpL2V2ZW50cycsIGZvcm1EYXRhKTtcbiAgICAgIHNldEV2ZW50cyhbcmVzLmRhdGEsIC4uLmV2ZW50c10pO1xuICAgICAgc2V0Rm9ybURhdGEoe1xuICAgICAgICB0aXRsZTogJycsXG4gICAgICAgIGRlc2NyaXB0aW9uOiAnJyxcbiAgICAgICAgZGF0ZTogJycsXG4gICAgICAgIHRpbWU6ICcnLFxuICAgICAgICB2ZW51ZTogJycsXG4gICAgICAgIGNhdGVnb3J5OiAnd29ya3Nob3AnLFxuICAgICAgICByZWdpc3RyYXRpb25MaW5rOiAnJ1xuICAgICAgfSk7XG4gICAgICBzZXRTaG93Rm9ybShmYWxzZSk7XG4gICAgfSBjYXRjaCAoZXJyb3IpIHtcbiAgICAgIGNvbnNvbGUuZXJyb3IoJ0Vycm9yIGNyZWF0aW5nIGV2ZW50OicsIGVycm9yKTtcbiAgICB9XG4gIH07XG5cbiAgY29uc3QgaGFuZGxlRGVsZXRlID0gYXN5bmMgKGlkKSA9PiB7XG4gICAgaWYgKGNvbmZpcm0oJ0FyZSB5b3Ugc3VyZSB5b3Ugd2FudCB0byBkZWxldGUgdGhpcyBldmVudD8nKSkge1xuICAgICAgdHJ5IHtcbiAgICAgICAgYXdhaXQgYXhpb3MuZGVsZXRlKGAvYXBpL2V2ZW50cy8ke2lkfWApO1xuICAgICAgICBzZXRFdmVudHMoZXZlbnRzLmZpbHRlcigoZXZlbnQpID0+IGV2ZW50Ll9pZCAhPT0gaWQpKTtcbiAgICAgIH0gY2F0Y2ggKGVycm9yKSB7XG4gICAgICAgIGNvbnNvbGUuZXJyb3IoJ0Vycm9yIGRlbGV0aW5nIGV2ZW50OicsIGVycm9yKTtcbiAgICAgIH1cbiAgICB9XG4gIH07XG5cbiAgcmV0dXJuIChcbiAgICA8ZGl2IGNsYXNzTmFtZT1cInNwYWNlLXktOFwiPlxuICAgICAgPGRpdiBjbGFzc05hbWU9XCJmbGV4IGl0ZW1zLWNlbnRlciBqdXN0aWZ5LWJldHdlZW5cIj5cbiAgICAgICAgPGRpdj5cbiAgICAgICAgICA8aDIgY2xhc3NOYW1lPVwidGV4dC0zeGwgZm9udC1ib2xkXCI+RXZlbnRzIE1hbmFnZXI8L2gyPlxuICAgICAgICAgIDxwIGNsYXNzTmFtZT1cInRleHQtZ3JheS02MDAgZGFyazp0ZXh0LWdyYXktNDAwXCI+XG4gICAgICAgICAgICB7Y2FuTWFuYWdlRXZlbnRzID8gJ0NyZWF0ZSBhbmQgbWFuYWdlIGV2ZW50cycgOiAnQnJvd3NlIGNoYXB0ZXIgZXZlbnRzIGFuZCBzdGF5IHVwZGF0ZWQnfVxuICAgICAgICAgIDwvcD5cbiAgICAgICAgPC9kaXY+XG4gICAgICAgIHtjYW5NYW5hZ2VFdmVudHMgJiYgKFxuICAgICAgICAgIDxidXR0b25cbiAgICAgICAgICAgIG9uQ2xpY2s9eygpID0+IHNldFNob3dGb3JtKCFzaG93Rm9ybSl9XG4gICAgICAgICAgICBjbGFzc05hbWU9XCJidG4gYnRuLXByaW1hcnkgZmxleCBpdGVtcy1jZW50ZXIgZ2FwLTJcIlxuICAgICAgICAgID5cbiAgICAgICAgICAgIDxGaVBsdXMgLz5cbiAgICAgICAgICAgIE5ldyBFdmVudFxuICAgICAgICAgIDwvYnV0dG9uPlxuICAgICAgICApfVxuICAgICAgPC9kaXY+XG5cbiAgICAgIHtjYW5NYW5hZ2VFdmVudHMgJiYgc2hvd0Zvcm0gJiYgKFxuICAgICAgICA8bW90aW9uLmRpdlxuICAgICAgICAgIGNsYXNzTmFtZT1cImdsYXNzbW9ycGhpc20gcm91bmRlZC0yeGwgcC04XCJcbiAgICAgICAgICBpbml0aWFsPXt7IG9wYWNpdHk6IDAsIHk6IC0yMCB9fVxuICAgICAgICAgIGFuaW1hdGU9e3sgb3BhY2l0eTogMSwgeTogMCB9fVxuICAgICAgICA+XG4gICAgICAgICAgPGgzIGNsYXNzTmFtZT1cIm1iLTYgdGV4dC14bCBmb250LWJvbGRcIj5DcmVhdGUgTmV3IEV2ZW50PC9oMz5cbiAgICAgICAgICA8Zm9ybSBvblN1Ym1pdD17aGFuZGxlU3VibWl0fSBjbGFzc05hbWU9XCJzcGFjZS15LTRcIj5cbiAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZ3JpZCBnYXAtNCBtZDpncmlkLWNvbHMtMlwiPlxuICAgICAgICAgICAgICA8aW5wdXRcbiAgICAgICAgICAgICAgICB0eXBlPVwidGV4dFwiXG4gICAgICAgICAgICAgICAgcGxhY2Vob2xkZXI9XCJFdmVudCBUaXRsZVwiXG4gICAgICAgICAgICAgICAgdmFsdWU9e2Zvcm1EYXRhLnRpdGxlfVxuICAgICAgICAgICAgICAgIG9uQ2hhbmdlPXsoZSkgPT4gc2V0Rm9ybURhdGEoeyAuLi5mb3JtRGF0YSwgdGl0bGU6IGUudGFyZ2V0LnZhbHVlIH0pfVxuICAgICAgICAgICAgICAgIHJlcXVpcmVkXG4gICAgICAgICAgICAgICAgY2xhc3NOYW1lPVwicm91bmRlZC1sZyBib3JkZXIgYm9yZGVyLXdoaXRlLzEwIGJnLXdoaXRlLzUgcHgtNCBweS0yIGZvY3VzOmJvcmRlci1ibHVlLTYwMCBmb2N1czpvdXRsaW5lLW5vbmVcIlxuICAgICAgICAgICAgICAvPlxuICAgICAgICAgICAgICA8c2VsZWN0XG4gICAgICAgICAgICAgICAgdmFsdWU9e2Zvcm1EYXRhLmNhdGVnb3J5fVxuICAgICAgICAgICAgICAgIG9uQ2hhbmdlPXsoZSkgPT4gc2V0Rm9ybURhdGEoeyAuLi5mb3JtRGF0YSwgY2F0ZWdvcnk6IGUudGFyZ2V0LnZhbHVlIH0pfVxuICAgICAgICAgICAgICAgIGNsYXNzTmFtZT1cInJvdW5kZWQtbGcgYm9yZGVyIGJvcmRlci13aGl0ZS8xMCBiZy1zbGF0ZS05MDAvODAgcHgtNCBweS0yIHRleHQtd2hpdGUgZm9jdXM6Ym9yZGVyLWJsdWUtNjAwIGZvY3VzOm91dGxpbmUtbm9uZVwiXG4gICAgICAgICAgICAgID5cbiAgICAgICAgICAgICAgICA8b3B0aW9uIHZhbHVlPVwid29ya3Nob3BcIiBjbGFzc05hbWU9XCJiZy1zbGF0ZS05MDAgdGV4dC13aGl0ZVwiPldvcmtzaG9wPC9vcHRpb24+XG4gICAgICAgICAgICAgICAgPG9wdGlvbiB2YWx1ZT1cInNlbWluYXJcIiBjbGFzc05hbWU9XCJiZy1zbGF0ZS05MDAgdGV4dC13aGl0ZVwiPlNlbWluYXI8L29wdGlvbj5cbiAgICAgICAgICAgICAgICA8b3B0aW9uIHZhbHVlPVwiaGFja2F0aG9uXCIgY2xhc3NOYW1lPVwiYmctc2xhdGUtOTAwIHRleHQtd2hpdGVcIj5IYWNrYXRob248L29wdGlvbj5cbiAgICAgICAgICAgICAgICA8b3B0aW9uIHZhbHVlPVwiY29tcGV0aXRpb25cIiBjbGFzc05hbWU9XCJiZy1zbGF0ZS05MDAgdGV4dC13aGl0ZVwiPkNvbXBldGl0aW9uPC9vcHRpb24+XG4gICAgICAgICAgICAgICAgPG9wdGlvbiB2YWx1ZT1cIm1lZXR1cFwiIGNsYXNzTmFtZT1cImJnLXNsYXRlLTkwMCB0ZXh0LXdoaXRlXCI+TWVldHVwPC9vcHRpb24+XG4gICAgICAgICAgICAgIDwvc2VsZWN0PlxuICAgICAgICAgICAgICA8aW5wdXRcbiAgICAgICAgICAgICAgICB0eXBlPVwiZGF0ZXRpbWUtbG9jYWxcIlxuICAgICAgICAgICAgICAgIHZhbHVlPXtmb3JtRGF0YS5kYXRlfVxuICAgICAgICAgICAgICAgIG9uQ2hhbmdlPXsoZSkgPT4gc2V0Rm9ybURhdGEoeyAuLi5mb3JtRGF0YSwgZGF0ZTogZS50YXJnZXQudmFsdWUgfSl9XG4gICAgICAgICAgICAgICAgcmVxdWlyZWRcbiAgICAgICAgICAgICAgICBjbGFzc05hbWU9XCJyb3VuZGVkLWxnIGJvcmRlciBib3JkZXItd2hpdGUvMTAgYmctd2hpdGUvNSBweC00IHB5LTIgZm9jdXM6Ym9yZGVyLWJsdWUtNjAwIGZvY3VzOm91dGxpbmUtbm9uZVwiXG4gICAgICAgICAgICAgIC8+XG4gICAgICAgICAgICAgIDxpbnB1dFxuICAgICAgICAgICAgICAgIHR5cGU9XCJ0ZXh0XCJcbiAgICAgICAgICAgICAgICBwbGFjZWhvbGRlcj1cIlZlbnVlXCJcbiAgICAgICAgICAgICAgICB2YWx1ZT17Zm9ybURhdGEudmVudWV9XG4gICAgICAgICAgICAgICAgb25DaGFuZ2U9eyhlKSA9PiBzZXRGb3JtRGF0YSh7IC4uLmZvcm1EYXRhLCB2ZW51ZTogZS50YXJnZXQudmFsdWUgfSl9XG4gICAgICAgICAgICAgICAgY2xhc3NOYW1lPVwicm91bmRlZC1sZyBib3JkZXIgYm9yZGVyLXdoaXRlLzEwIGJnLXdoaXRlLzUgcHgtNCBweS0yIGZvY3VzOmJvcmRlci1ibHVlLTYwMCBmb2N1czpvdXRsaW5lLW5vbmVcIlxuICAgICAgICAgICAgICAvPlxuICAgICAgICAgICAgICA8aW5wdXRcbiAgICAgICAgICAgICAgICB0eXBlPVwidXJsXCJcbiAgICAgICAgICAgICAgICBwbGFjZWhvbGRlcj1cIlJlZ2lzdHJhdGlvbiBMaW5rXCJcbiAgICAgICAgICAgICAgICB2YWx1ZT17Zm9ybURhdGEucmVnaXN0cmF0aW9uTGlua31cbiAgICAgICAgICAgICAgICBvbkNoYW5nZT17KGUpID0+IHNldEZvcm1EYXRhKHsgLi4uZm9ybURhdGEsIHJlZ2lzdHJhdGlvbkxpbms6IGUudGFyZ2V0LnZhbHVlIH0pfVxuICAgICAgICAgICAgICAgIGNsYXNzTmFtZT1cInJvdW5kZWQtbGcgYm9yZGVyIGJvcmRlci13aGl0ZS8xMCBiZy13aGl0ZS81IHB4LTQgcHktMiBmb2N1czpib3JkZXItYmx1ZS02MDAgZm9jdXM6b3V0bGluZS1ub25lIG1kOmNvbC1zcGFuLTJcIlxuICAgICAgICAgICAgICAvPlxuICAgICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgICA8dGV4dGFyZWFcbiAgICAgICAgICAgICAgcGxhY2Vob2xkZXI9XCJFdmVudCBEZXNjcmlwdGlvblwiXG4gICAgICAgICAgICAgIHZhbHVlPXtmb3JtRGF0YS5kZXNjcmlwdGlvbn1cbiAgICAgICAgICAgICAgb25DaGFuZ2U9eyhlKSA9PiBzZXRGb3JtRGF0YSh7IC4uLmZvcm1EYXRhLCBkZXNjcmlwdGlvbjogZS50YXJnZXQudmFsdWUgfSl9XG4gICAgICAgICAgICAgIHJlcXVpcmVkXG4gICAgICAgICAgICAgIHJvd3M9XCI0XCJcbiAgICAgICAgICAgICAgY2xhc3NOYW1lPVwidy1mdWxsIHJlc2l6ZS1ub25lIHJvdW5kZWQtbGcgYm9yZGVyIGJvcmRlci13aGl0ZS8xMCBiZy13aGl0ZS81IHB4LTQgcHktMiBmb2N1czpib3JkZXItYmx1ZS02MDAgZm9jdXM6b3V0bGluZS1ub25lXCJcbiAgICAgICAgICAgIC8+XG4gICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImZsZXggZ2FwLTRcIj5cbiAgICAgICAgICAgICAgPGJ1dHRvbiB0eXBlPVwic3VibWl0XCIgY2xhc3NOYW1lPVwiYnRuIGJ0bi1wcmltYXJ5XCI+Q3JlYXRlIEV2ZW50PC9idXR0b24+XG4gICAgICAgICAgICAgIDxidXR0b25cbiAgICAgICAgICAgICAgICB0eXBlPVwiYnV0dG9uXCJcbiAgICAgICAgICAgICAgICBvbkNsaWNrPXsoKSA9PiBzZXRTaG93Rm9ybShmYWxzZSl9XG4gICAgICAgICAgICAgICAgY2xhc3NOYW1lPVwiYnRuIGJ0bi1vdXRsaW5lXCJcbiAgICAgICAgICAgICAgPlxuICAgICAgICAgICAgICAgIENhbmNlbFxuICAgICAgICAgICAgICA8L2J1dHRvbj5cbiAgICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgIDwvZm9ybT5cbiAgICAgICAgPC9tb3Rpb24uZGl2PlxuICAgICAgKX1cblxuICAgICAgPGRpdiBjbGFzc05hbWU9XCJzcGFjZS15LTRcIj5cbiAgICAgICAge2xvYWRpbmcgPyAoXG4gICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJweS04IHRleHQtY2VudGVyXCI+XG4gICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImlubGluZS1ibG9jayBoLTggdy04IGFuaW1hdGUtc3BpbiByb3VuZGVkLWZ1bGwgYm9yZGVyLXQtMiBib3JkZXItYi0yIGJvcmRlci1ibHVlLTYwMFwiPjwvZGl2PlxuICAgICAgICAgIDwvZGl2PlxuICAgICAgICApIDogZXZlbnRzLmxlbmd0aCA+IDAgPyAoXG4gICAgICAgICAgZXZlbnRzLm1hcCgoZXZlbnQsIGlkeCkgPT4gKFxuICAgICAgICAgICAgPG1vdGlvbi5kaXZcbiAgICAgICAgICAgICAga2V5PXtldmVudC5faWR9XG4gICAgICAgICAgICAgIGNsYXNzTmFtZT1cImdsYXNzbW9ycGhpc20gZmxleCBpdGVtcy1zdGFydCBqdXN0aWZ5LWJldHdlZW4gcm91bmRlZC14bCBwLTZcIlxuICAgICAgICAgICAgICBpbml0aWFsPXt7IG9wYWNpdHk6IDAsIHk6IDIwIH19XG4gICAgICAgICAgICAgIGFuaW1hdGU9e3sgb3BhY2l0eTogMSwgeTogMCB9fVxuICAgICAgICAgICAgICB0cmFuc2l0aW9uPXt7IGRlbGF5OiBpZHggKiAwLjEgfX1cbiAgICAgICAgICAgID5cbiAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJmbGV4LTFcIj5cbiAgICAgICAgICAgICAgICA8aDMgY2xhc3NOYW1lPVwibWItMiB0ZXh0LWxnIGZvbnQtYm9sZFwiPntldmVudC50aXRsZX08L2gzPlxuICAgICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZmxleCBmbGV4LXdyYXAgZ2FwLTMgdGV4dC1zbSB0ZXh0LWdyYXktNjAwIGRhcms6dGV4dC1ncmF5LTQwMFwiPlxuICAgICAgICAgICAgICAgICAgPHNwYW4+e2BEYXRlOiAke25ldyBEYXRlKGV2ZW50LmRhdGUpLnRvTG9jYWxlRGF0ZVN0cmluZygpfWB9PC9zcGFuPlxuICAgICAgICAgICAgICAgICAgPHNwYW4+e2BWZW51ZTogJHtldmVudC52ZW51ZSB8fCAnT25saW5lJ31gfTwvc3Bhbj5cbiAgICAgICAgICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cImNhcGl0YWxpemVcIj57YENhdGVnb3J5OiAke2V2ZW50LmNhdGVnb3J5fWB9PC9zcGFuPlxuICAgICAgICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgICAgICAgIHshY2FuTWFuYWdlRXZlbnRzICYmIChcbiAgICAgICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwibXQtNFwiPlxuICAgICAgICAgICAgICAgICAgICB7ZXZlbnQucmVnaXN0cmF0aW9uTGluayA/IChcbiAgICAgICAgICAgICAgICAgICAgICA8YVxuICAgICAgICAgICAgICAgICAgICAgICAgaHJlZj17ZXZlbnQucmVnaXN0cmF0aW9uTGlua31cbiAgICAgICAgICAgICAgICAgICAgICAgIHRhcmdldD1cIl9ibGFua1wiXG4gICAgICAgICAgICAgICAgICAgICAgICByZWw9XCJub29wZW5lciBub3JlZmVycmVyXCJcbiAgICAgICAgICAgICAgICAgICAgICAgIGNsYXNzTmFtZT1cImJ0biBidG4tcHJpbWFyeSBpbmxpbmUtZmxleFwiXG4gICAgICAgICAgICAgICAgICAgICAgPlxuICAgICAgICAgICAgICAgICAgICAgICAgUmVnaXN0ZXIgRXZlbnRcbiAgICAgICAgICAgICAgICAgICAgICA8L2E+XG4gICAgICAgICAgICAgICAgICAgICkgOiAoXG4gICAgICAgICAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJ0ZXh0LXNtIHRleHQtZ3JheS01MDAgZGFyazp0ZXh0LWdyYXktNDAwXCI+XG4gICAgICAgICAgICAgICAgICAgICAgICBSZWdpc3RyYXRpb24gbGluayB3aWxsIGJlIGF2YWlsYWJsZSBzb29uLlxuICAgICAgICAgICAgICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgICAgICAgICAgICApfVxuICAgICAgICAgICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgICAgICAgKX1cbiAgICAgICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgICAgIHtjYW5NYW5hZ2VFdmVudHMgJiYgKFxuICAgICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZmxleCBnYXAtMlwiPlxuICAgICAgICAgICAgICAgICAgPGJ1dHRvbiBjbGFzc05hbWU9XCJyb3VuZGVkLWxnIHAtMiB0cmFuc2l0aW9uLWFsbCBob3ZlcjpiZy1ibHVlLTUwMC8yMFwiPlxuICAgICAgICAgICAgICAgICAgICA8RmlFZGl0MiBjbGFzc05hbWU9XCJ0ZXh0LWJsdWUtNjAwXCIgLz5cbiAgICAgICAgICAgICAgICAgIDwvYnV0dG9uPlxuICAgICAgICAgICAgICAgICAgPGJ1dHRvblxuICAgICAgICAgICAgICAgICAgICBvbkNsaWNrPXsoKSA9PiBoYW5kbGVEZWxldGUoZXZlbnQuX2lkKX1cbiAgICAgICAgICAgICAgICAgICAgY2xhc3NOYW1lPVwicm91bmRlZC1sZyBwLTIgdHJhbnNpdGlvbi1hbGwgaG92ZXI6YmctcmVkLTUwMC8yMFwiXG4gICAgICAgICAgICAgICAgICA+XG4gICAgICAgICAgICAgICAgICAgIDxGaVRyYXNoMiBjbGFzc05hbWU9XCJ0ZXh0LXJlZC02MDBcIiAvPlxuICAgICAgICAgICAgICAgICAgPC9idXR0b24+XG4gICAgICAgICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgICAgICl9XG4gICAgICAgICAgICA8L21vdGlvbi5kaXY+XG4gICAgICAgICAgKSlcbiAgICAgICAgKSA6IChcbiAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cInB5LTggdGV4dC1jZW50ZXIgdGV4dC1ncmF5LTYwMCBkYXJrOnRleHQtZ3JheS00MDBcIj5cbiAgICAgICAgICAgIHtjYW5NYW5hZ2VFdmVudHMgPyAnTm8gZXZlbnRzIHlldC4gQ3JlYXRlIG9uZSB0byBnZXQgc3RhcnRlZCEnIDogJ05vIGV2ZW50cyBoYXZlIGJlZW4gcHVibGlzaGVkIHlldC4nfVxuICAgICAgICAgIDwvZGl2PlxuICAgICAgICApfVxuICAgICAgPC9kaXY+XG4gICAgPC9kaXY+XG4gICk7XG59XG4iXSwiZmlsZSI6IkM6L1VzZXJzL2tvdGlyL09uZURyaXZlL0Rlc2t0b3AvSUVFRS9jbGllbnQvc3JjL2NvbXBvbmVudHMvRGFzaGJvYXJkL0V2ZW50c01hbmFnZXIuanN4In0=
