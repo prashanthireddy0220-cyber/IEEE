@@ -45,6 +45,19 @@ export const fallbackTeamMembers = [
   },
   {
     _id: 'fallback-chairperson',
+    name: 'C.Yasasvi Reddy',
+    role: 'chairman',
+    email: 'yasasvireddy919@gmail.com',
+    phone: '9390198225',
+    photo: saiChakradharPhoto,
+    socialMedia: {
+      linkedin: 'https://www.linkedin.com/in/cyasasvi-reddy-2848a3376?utm_source=share_via&utm_content=profile&utm_medium=member_android',
+      instagram: 'https://www.instagram.com/yasasvi_reddy______?igsh=MTdtOWI2cGJ0djN1OA=='
+    },
+    bio: 'Leading the chapter vision, coordinating teams, and driving impactful initiatives across the student branch.'
+  },
+  {
+    _id: 'fallback-chairperson',
     name: 'O.SaiChakradhar Reddy',
     role: 'chairman',
     email: 'saichakridhar123@gmail.com',
@@ -82,6 +95,19 @@ export const fallbackTeamMembers = [
     },
     bio: 'Representing the student community, strengthening engagement, and helping chapter programs run smoothly.'
   },
+   {
+    _id: 'fallback-president',
+    name: 'K.Harsha Vardhan',
+    role: ' Vice President',
+    email: '',
+    phone: '',
+    photo: ajayPhoto,
+    socialMedia: {
+      linkedin: '',
+      instagram: ''
+    },
+    bio: 'Representing the student community, strengthening engagement, and helping chapter programs run smoothly.'
+  },
   {
     _id: 'fallback-core-web-team-1',
     name: 'Putluru Prashanthi',
@@ -110,6 +136,22 @@ export const fallbackTeamMembers = [
     },
     bio: 'Helping shape member engagement, participation, and vibrant chapter culture across events and activities.'
   },
+   {
+    _id: 'fallback-core-web-team-2',
+    name: 'D.Pavan Kumar Reddy',
+    role: 'core-team',
+    email: '99240040829@klu.ac.in',
+    department: 'Treasurer',
+    phone: '',
+    photo: chaitanyaPhoto,
+    socialMedia: {
+      linkedin: '',
+      instagram: ''
+    },
+    bio: 'Helping shape member engagement, participation, and vibrant chapter culture across events and activities.'
+  },
+  
+
   {
     _id: 'fallback-core-secretaries-1',
     name: 'Singam SettyGreeshma Royal',
@@ -137,6 +179,7 @@ export const fallbackTeamMembers = [
     },
     bio: 'Helping maintain safe, organized, and well-managed environments during chapter activities.'
   },
+
   {
     _id: 'fallback-core-technical-team-1',
     name: 'Sai Prakyath',
@@ -150,6 +193,19 @@ export const fallbackTeamMembers = [
       instagram: 'https://www.instagram.com/iam_lucky_s?igsh=eXNxNXNnNnRobHI1'
     },
     bio: 'Coordinating smooth event flow, venue readiness, and on-stage execution for chapter programs.'
+  },
+     {
+    _id: 'fallback-core-content-team-1',
+    name: 'Ajay Vairam T',
+    role: 'core-team',
+    department: 'Technical Team',
+    phone: '',
+    photo: '',
+    socialMedia: {
+      linkedin: '',
+      instagram: ''
+    },
+    bio: 'Crafting clear, engaging, and meaningful written content for chapter activities and outreach.'
   },
   {
     _id: 'fallback-core-event-coordinator-team-1',
@@ -205,6 +261,45 @@ export const fallbackTeamMembers = [
       instagram: 'https://www.instagram.com/saicharanreddy_29?igsh=MThydzJtYTBsZXVoZw=='
     },
     bio: 'Helping plan, organize, and execute engaging chapter events from start to finish.'
+  },
+   {
+    _id: 'fallback-core-content-team-1',
+    name: 'Y.Harini',
+    role: 'core-team',
+    department: 'Event Coordinator Team ',
+    phone: '',
+    photo: '',
+    socialMedia: {
+      linkedin: '',
+      instagram: ''
+    },
+    bio: 'Crafting clear, engaging, and meaningful written content for chapter activities and outreach.'
+  },
+     {
+    _id: 'fallback-core-content-team-1',
+    name: 'Y.Nikitha',
+    role: 'core-team',
+    department: 'Event Coordinator Team ',
+    phone: '',
+    photo: '',
+    socialMedia: {
+      linkedin: '',
+      instagram: ''
+    },
+    bio: 'Crafting clear, engaging, and meaningful written content for chapter activities and outreach.'
+  },
+     {
+    _id: 'fallback-core-content-team-1',
+    name: 'S.Ganesh Kumar',
+    role: 'core-team',
+    department: 'Event Coordinator Team ',
+    phone: '',
+    photo: '',
+    socialMedia: {
+      linkedin: '',
+      instagram: ''
+    },
+    bio: 'Crafting clear, engaging, and meaningful written content for chapter activities and outreach.'
   },
   {
     _id: 'fallback-core-research-team-1',
@@ -266,6 +361,32 @@ export const fallbackTeamMembers = [
     name: 'N.Venkat Vinay',
     role: 'core-team',
     department: 'Content Team Lead',
+    phone: '',
+    photo: '',
+    socialMedia: {
+      linkedin: '',
+      instagram: ''
+    },
+    bio: 'Crafting clear, engaging, and meaningful written content for chapter activities and outreach.'
+  },
+   {
+    _id: 'fallback-core-content-team-1',
+    name: 'B.Tarun Tej',
+    role: 'core-team',
+    department: 'Content Team ',
+    phone: '',
+    photo: '',
+    socialMedia: {
+      linkedin: '',
+      instagram: ''
+    },
+    bio: 'Crafting clear, engaging, and meaningful written content for chapter activities and outreach.'
+  },
+   {
+    _id: 'fallback-core-content-team-1',
+    name: 'B.Dharaneeswar',
+    role: 'core-team',
+    department: 'Content Team ',
     phone: '',
     photo: '',
     socialMedia: {
