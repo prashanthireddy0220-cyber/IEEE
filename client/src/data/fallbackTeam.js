@@ -144,7 +144,7 @@ export const fallbackTeamMembers = [
     email: '99240040829@klu.ac.in',
     department: 'Treasurer',
     phone: '',
-    photo: chaitanyaPhoto,
+    photo: '',
     socialMedia: {
       linkedin: '',
       instagram: ''
