@@ -16,6 +16,7 @@ import chinnaSamyPhoto from '../assets/team/chinna-samy.jpeg';
 import krithigaPhoto from '../assets/team/krithiga.jpeg';
 import saiChakradharPhoto from '../assets/team/sai-chakradhar.jpeg';
 import greeshmaPhoto from '../assets/team/greeshma.jpeg';
+import yasasviPhoto from '../assets/team/yasasvi.jpeg';
 
 export const fallbackTeamMembers = [
   {
@@ -44,12 +45,12 @@ export const fallbackTeamMembers = [
     bio: 'Supporting the chapter with faculty guidance, academic coordination, and student mentorship.'
   },
   {
-    _id: 'fallback-chairperson',
+    _id: 'fallback-chairperson-yasasvi',
     name: 'C.Yasasvi Reddy',
     role: 'chairman',
     email: 'yasasvireddy919@gmail.com',
     phone: '9390198225',
-    photo: saiChakradharPhoto,
+    photo: yasasviPhoto,
     socialMedia: {
       linkedin: 'https://www.linkedin.com/in/cyasasvi-reddy-2848a3376?utm_source=share_via&utm_content=profile&utm_medium=member_android',
       instagram: 'https://www.instagram.com/yasasvi_reddy______?igsh=MTdtOWI2cGJ0djN1OA=='
@@ -57,7 +58,7 @@ export const fallbackTeamMembers = [
     bio: 'Leading the chapter vision, coordinating teams, and driving impactful initiatives across the student branch.'
   },
   {
-    _id: 'fallback-chairperson',
+    _id: 'fallback-chairperson-sai-chakradhar',
     name: 'O.SaiChakradhar Reddy',
     role: 'chairman',
     email: 'saichakridhar123@gmail.com',
@@ -88,7 +89,7 @@ export const fallbackTeamMembers = [
     role: 'president',
     email: 'reddyajay510@gmail.com',
     phone: '9063931285',
-    photo: ajayPhoto,
+    photo: '',
     socialMedia: {
       linkedin: 'https://www.linkedin.com/in/ajay-reddy510',
       instagram: ''
@@ -137,7 +138,7 @@ export const fallbackTeamMembers = [
     bio: 'Helping shape member engagement, participation, and vibrant chapter culture across events and activities.'
   },
    {
-    _id: 'fallback-core-web-team-2',
+    _id: 'fallback-core-treasurer-pavan',
     name: 'D.Pavan Kumar Reddy',
     role: 'core-team',
     email: '99240040829@klu.ac.in',
@@ -195,7 +196,7 @@ export const fallbackTeamMembers = [
     bio: 'Coordinating smooth event flow, venue readiness, and on-stage execution for chapter programs.'
   },
      {
-    _id: 'fallback-core-content-team-1',
+    _id: 'fallback-core-technical-team-2',
     name: 'Ajay Vairam T',
     role: 'core-team',
     department: 'Technical Team',
@@ -263,7 +264,7 @@ export const fallbackTeamMembers = [
     bio: 'Helping plan, organize, and execute engaging chapter events from start to finish.'
   },
    {
-    _id: 'fallback-core-content-team-1',
+    _id: 'fallback-core-event-coordinator-team-5',
     name: 'Y.Harini',
     role: 'core-team',
     department: 'Event Coordinator Team ',
@@ -276,7 +277,7 @@ export const fallbackTeamMembers = [
     bio: 'Crafting clear, engaging, and meaningful written content for chapter activities and outreach.'
   },
      {
-    _id: 'fallback-core-content-team-1',
+    _id: 'fallback-core-event-coordinator-team-6',
     name: 'Y.Nikitha',
     role: 'core-team',
     department: 'Event Coordinator Team ',
@@ -289,7 +290,7 @@ export const fallbackTeamMembers = [
     bio: 'Crafting clear, engaging, and meaningful written content for chapter activities and outreach.'
   },
      {
-    _id: 'fallback-core-content-team-1',
+    _id: 'fallback-core-event-coordinator-team-7',
     name: 'S.Ganesh Kumar',
     role: 'core-team',
     department: 'Event Coordinator Team ',
@@ -357,7 +358,7 @@ export const fallbackTeamMembers = [
     bio: 'Creating visual assets and strong design support for chapter branding and event communication.'
   },
   {
-    _id: 'fallback-core-content-team-1',
+    _id: 'fallback-core-content-team-lead',
     name: 'N.Venkat Vinay',
     role: 'core-team',
     department: 'Content Team Lead',
@@ -370,7 +371,7 @@ export const fallbackTeamMembers = [
     bio: 'Crafting clear, engaging, and meaningful written content for chapter activities and outreach.'
   },
    {
-    _id: 'fallback-core-content-team-1',
+    _id: 'fallback-core-content-team-2',
     name: 'B.Tarun Tej',
     role: 'core-team',
     department: 'Content Team ',
@@ -383,7 +384,7 @@ export const fallbackTeamMembers = [
     bio: 'Crafting clear, engaging, and meaningful written content for chapter activities and outreach.'
   },
    {
-    _id: 'fallback-core-content-team-1',
+    _id: 'fallback-core-content-team-3',
     name: 'B.Dharaneeswar',
     role: 'core-team',
     department: 'Content Team ',
@@ -418,7 +419,7 @@ export function isObsoleteStandaloneMember(member) {
 
 export function mergeFallbackTeamMembers(members = []) {
   const mergedMembers = members.filter((member) => !isObsoleteStandaloneMember(member));
-  const singleRoleFallbacks = new Set(['chairman', 'student-chairperson', 'president']);
+  const singleRoleFallbacks = new Set(['student-chairperson', 'president']);
 
   fallbackTeamMembers.forEach((fallbackMember) => {
     if (isObsoleteStandaloneMember(fallbackMember)) return;
@@ -427,7 +428,8 @@ export function mergeFallbackTeamMembers(members = []) {
       ? mergedMembers.some((member) => member.role === fallbackMember.role)
       : mergedMembers.some(
           (member) =>
-            member._id === fallbackMember._id
+            member._id === fallbackMember._id ||
+            member.name?.trim().toLowerCase() === fallbackMember.name?.trim().toLowerCase()
         );
 
     if (!exists) {
