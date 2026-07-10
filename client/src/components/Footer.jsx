@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { FiInstagram, FiLinkedin, FiMail, FiMapPin, FiPhone } from 'react-icons/fi';
-import brandLogo from '../assets/ieee-educational-society-logo.svg';
+import brandLogo from '../assets/kare-logo.jpeg';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
@@ -48,7 +48,10 @@ export default function Footer() {
                 </div>
                 <div className="flex items-start gap-3">
                   <FiPhone className="mt-1 text-cyan-500" />
-                  <span>+91 98765 43210</span>
+                  <span className="flex flex-col gap-1">
+                    <span>93901 98225</span>
+                    <span>93901 98225</span>
+                  </span>
                 </div>
                 <div className="flex items-start gap-3">
                   <FiMapPin className="mt-1 text-emerald-500" />

@@ -14,9 +14,32 @@ export default function Team() {
     chairman: 'Chairperson',
     'student-chairperson': 'Vice Chairperson',
     president: 'President',
+    leads: 'Leads',
+    secretary: 'Secretary',
     'core-team': 'Core Team'
   };
-  const groupedRoles = ['faculty', 'chairman', 'student-chairperson', 'president', 'core-team'];
+  const groupedRoles = ['faculty', 'chairman', 'student-chairperson', 'president', 'leads', 'secretary', 'core-team'];
+  const isCoreTeamLead = (member) =>
+    member?.role === 'core-team' && /lead/i.test(member?.department || '');
+  const isCoreTeamSecretary = (member) =>
+    member?.role === 'core-team' && /secretary/i.test(member?.department || '');
+  const getMembersForRole = (roleKey) => {
+    if (roleKey === 'leads') {
+      return team.filter(isCoreTeamLead);
+    }
+
+    if (roleKey === 'secretary') {
+      return team.filter(isCoreTeamSecretary);
+    }
+
+    if (roleKey === 'core-team') {
+      return team.filter(
+        (member) => member.role === 'core-team' && !isCoreTeamLead(member) && !isCoreTeamSecretary(member)
+      );
+    }
+
+    return team.filter((member) => member.role === roleKey);
+  };
 
   useEffect(() => {
     fetchTeam();
@@ -42,11 +65,11 @@ export default function Team() {
     if (role === 'all') {
       setFilteredTeam(team);
     } else {
-      setFilteredTeam(team.filter(member => member.role === role));
+      setFilteredTeam(getMembersForRole(role));
     }
   };
 
-  const roles = ['faculty', 'chairman', 'student-chairperson', 'president', 'core-team'];
+  const roles = ['faculty', 'chairman', 'student-chairperson', 'president', 'leads', 'secretary', 'core-team'];
 
   return (
     <div className="min-h-screen pt-20">
@@ -102,7 +125,7 @@ export default function Team() {
             </div>
           ) : role === 'all' ? (
             groupedRoles.map((roleKey) => {
-              const members = team.filter((member) => member.role === roleKey);
+              const members = getMembersForRole(roleKey);
               if (members.length === 0) return null;
 
               return (
@@ -117,7 +140,10 @@ export default function Team() {
 
                   <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
                     {members.map((member) => (
-                      <TeamMemberCard key={member._id} member={member} />
+                      <TeamMemberCard
+                        key={member._id}
+                        member={['leads', 'secretary'].includes(roleKey) ? { ...member, role: roleKey } : member}
+                      />
                     ))}
                   </div>
                 </div>
@@ -126,7 +152,10 @@ export default function Team() {
           ) : filteredTeam.length > 0 ? (
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
               {filteredTeam.map((member) => (
-                <TeamMemberCard key={member._id} member={member} />
+                <TeamMemberCard
+                  key={member._id}
+                  member={['leads', 'secretary'].includes(role) ? { ...member, role } : member}
+                />
               ))}
             </div>
           ) : (

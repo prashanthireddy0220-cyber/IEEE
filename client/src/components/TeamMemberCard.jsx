@@ -9,6 +9,8 @@ export default function TeamMemberCard({ member }) {
     chairman: 'Chairperson',
     'student-chairperson': 'Vice Chairperson',
     president: 'President',
+    leads: 'Leads',
+    secretary: 'Secretary',
     'core-team': 'Core Team',
   };
 
@@ -38,7 +40,7 @@ export default function TeamMemberCard({ member }) {
             <div className="absolute bottom-3 left-3 max-w-[78%] rounded-[16px] bg-slate-950/70 px-3 py-2 backdrop-blur-md sm:bottom-5 sm:left-5 sm:max-w-none sm:rounded-[24px] sm:px-4 sm:py-4">
               <div>
                 <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-sky-300 sm:text-xs sm:tracking-[0.2em]">{displayRole}</div>
-                <div className="mt-1 text-xs font-bold text-white sm:text-lg">{member?.department || 'IEEE Chapter'}</div>
+                <div className="mt-1 text-xs font-bold text-white sm:text-base">{member?.department || 'IEEE EDUCATION SOCIETY MEMBER'}</div>
               </div>
             </div>
           </div>

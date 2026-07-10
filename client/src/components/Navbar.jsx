@@ -5,7 +5,7 @@ import { FiLogIn, FiLogOut, FiMenu, FiMoon, FiSun, FiX } from 'react-icons/fi';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
 import { roleConfig } from '../data/siteContent';
-import brandLogo from '../assets/ieee-educational-society-logo.svg';
+import brandLogo from '../assets/kare-logo.jpeg';
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
