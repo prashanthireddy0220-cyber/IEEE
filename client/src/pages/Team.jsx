@@ -10,20 +10,28 @@ export default function Team() {
   const [role, setRole] = useState('all');
   const [loading, setLoading] = useState(true);
   const teamRoleLabels = {
+    'sbc-counsellor': 'SBC Counsellor',
     faculty: 'Faculty',
     chairman: 'Chairperson',
     'student-chairperson': 'Vice Chairperson',
     president: 'President',
+    'vice-president': 'Vice President',
     leads: 'Leads',
     secretary: 'Secretary',
     'core-team': 'Core Team'
   };
-  const groupedRoles = ['faculty', 'chairman', 'student-chairperson', 'president', 'leads', 'secretary', 'core-team'];
+  const groupedRoles = ['sbc-counsellor', 'faculty', 'chairman', 'student-chairperson', 'president', 'vice-president', 'leads', 'secretary', 'core-team'];
   const isCoreTeamLead = (member) =>
     member?.role === 'core-team' && /lead/i.test(member?.department || '');
   const isCoreTeamSecretary = (member) =>
     member?.role === 'core-team' && /secretary/i.test(member?.department || '');
+  const isCoreTeamVicePresident = (member) =>
+    member?.role === 'core-team' && /vice\s*president/i.test(member?.department || '');
   const getMembersForRole = (roleKey) => {
+    if (roleKey === 'vice-president') {
+      return team.filter(isCoreTeamVicePresident);
+    }
+
     if (roleKey === 'leads') {
       return team.filter(isCoreTeamLead);
     }
@@ -34,7 +42,11 @@ export default function Team() {
 
     if (roleKey === 'core-team') {
       return team.filter(
-        (member) => member.role === 'core-team' && !isCoreTeamLead(member) && !isCoreTeamSecretary(member)
+        (member) =>
+          member.role === 'core-team' &&
+          !isCoreTeamVicePresident(member) &&
+          !isCoreTeamLead(member) &&
+          !isCoreTeamSecretary(member)
       );
     }
 
@@ -69,7 +81,7 @@ export default function Team() {
     }
   };
 
-  const roles = ['faculty', 'chairman', 'student-chairperson', 'president', 'leads', 'secretary', 'core-team'];
+  const roles = ['sbc-counsellor', 'faculty', 'chairman', 'student-chairperson', 'president', 'vice-president', 'leads', 'secretary', 'core-team'];
 
   return (
     <div className="min-h-screen pt-20">
@@ -142,7 +154,7 @@ export default function Team() {
                     {members.map((member) => (
                       <TeamMemberCard
                         key={member._id}
-                        member={['leads', 'secretary'].includes(roleKey) ? { ...member, role: roleKey } : member}
+                        member={['vice-president', 'leads', 'secretary'].includes(roleKey) ? { ...member, role: roleKey } : member}
                       />
                     ))}
                   </div>
@@ -154,7 +166,7 @@ export default function Team() {
               {filteredTeam.map((member) => (
                 <TeamMemberCard
                   key={member._id}
-                  member={['leads', 'secretary'].includes(role) ? { ...member, role } : member}
+                  member={['vice-president', 'leads', 'secretary'].includes(role) ? { ...member, role } : member}
                 />
               ))}
             </div>

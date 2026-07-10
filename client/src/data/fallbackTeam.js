@@ -17,12 +17,13 @@ import krithigaPhoto from '../assets/team/krithiga.jpeg';
 import saiChakradharPhoto from '../assets/team/sai-chakradhar.jpeg';
 import greeshmaPhoto from '../assets/team/greeshma.jpeg';
 import yasasviPhoto from '../assets/team/yasasvi.jpeg';
+import harshaVardhanPhoto from '../assets/team/harsha-vardhan.jpeg';
 
 export const fallbackTeamMembers = [
   {
     _id: 'fallback-faculty',
     name: 'Dr.P.ChinnaSamy',
-    role: 'faculty',
+    role: 'sbc-counsellor',
     phone: '9600281664',
     photo: chinnaSamyPhoto,
     socialMedia: {
@@ -97,12 +98,13 @@ export const fallbackTeamMembers = [
     bio: 'Representing the student community, strengthening engagement, and helping chapter programs run smoothly.'
   },
    {
-    _id: 'fallback-president',
+    _id: 'fallback-core-vice-president',
     name: 'K.Harsha Vardhan',
-    role: ' Vice President',
+    role: 'core-team',
+    department: 'Vice President',
     email: '',
     phone: '',
-    photo: ajayPhoto,
+    photo: harshaVardhanPhoto,
     socialMedia: {
       linkedin: '',
       instagram: ''

@@ -1,6 +1,30 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import axios from 'axios';
+
+const hyperLaunchModules = import.meta.glob('../assets/gallery/hyper-launch-*.{jpg,jpeg,png,webp}', {
+  eager: true,
+  import: 'default'
+});
+
+const eduthonModules = import.meta.glob('../assets/gallery/eduthon-*.{jpg,jpeg,png,webp}', {
+  eager: true,
+  import: 'default'
+});
+
+const createEventImages = (modules, album, category) =>
+  Object.entries(modules)
+    .sort(([firstPath], [secondPath]) => firstPath.localeCompare(secondPath))
+    .map(([, url], index) => ({
+      url,
+      caption: `${album} ${index + 1}`,
+      album,
+      category
+    }));
+
+const hyperLaunchImages = createEventImages(hyperLaunchModules, 'Hyper Launch Event', 'hyper launch');
+const eduthonImages = createEventImages(eduthonModules, 'Eduthon Event', 'eduthon');
+const localEventImages = [...hyperLaunchImages, ...eduthonImages];
 
 export default function Gallery() {
   const [galleries, setGalleries] = useState([]);
@@ -15,7 +39,7 @@ export default function Gallery() {
   const fetchGalleries = async () => {
     try {
       const res = await axios.get('/api/gallery');
-      setGalleries(res.data);
+      setGalleries(res.data || []);
     } catch (error) {
       console.error('Error fetching galleries:', error);
     } finally {
@@ -23,117 +47,168 @@ export default function Gallery() {
     }
   };
 
-  const allImages = galleries.flatMap(g =>
-    g.images.map(img => ({ ...img, album: g.albumName, category: g.category }))
+  const apiImages = useMemo(
+    () =>
+      galleries.flatMap((gallery) =>
+        (gallery.images || []).map((image) => ({
+          ...image,
+          album: gallery.albumName,
+          category: gallery.category,
+          caption: image.caption || gallery.albumName
+        }))
+      ),
+    [galleries]
   );
 
+  const allImages = useMemo(() => [...localEventImages, ...apiImages], [apiImages]);
   const filteredImages = selectedCategory === 'all'
     ? allImages
-    : allImages.filter(img => img.category === selectedCategory);
-
-  const categories = ['all', ...new Set(galleries.map(g => g.category))];
+    : allImages.filter((image) => image.category === selectedCategory);
+  const carouselImages = filteredImages.length > 0 ? filteredImages : localEventImages;
+  const duplicatedImages = [...carouselImages, ...carouselImages];
+  const categories = ['all', ...new Set(allImages.map((image) => image.category).filter(Boolean))];
 
   return (
     <div className="min-h-screen pt-20">
-      {/* Hero */}
-      <section className="py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-transparent to-blue-50 dark:to-blue-950/20">
-        <div className="max-w-7xl mx-auto text-center">
-          <motion.h1
-            className="text-5xl font-bold mb-4 gradient-text"
+      <section className="px-4 py-14 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl">
+          <motion.div
+            className="text-center"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            Photo Gallery
-          </motion.h1>
-          <motion.p
-            className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-          >
-            Relive the moments from our amazing events and activities.
-          </motion.p>
+            <span className="eyebrow">Gallery</span>
+            <h1 className="text-4xl font-bold sm:text-6xl">
+              Chapter Event Moments
+            </h1>
+            <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-slate-600 dark:text-slate-300 sm:text-lg">
+              Event photos, chapter memories, and uploaded gallery albums in one smooth showcase.
+            </p>
+          </motion.div>
         </div>
       </section>
 
-      {/* Filters */}
-      <section className="py-8 px-4 sm:px-6 lg:px-8 border-b border-white/10">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-wrap gap-3">
-            {categories.map(cat => (
+      <section className="px-4 pb-8 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl">
+          <div className="flex flex-wrap justify-center gap-3">
+            {categories.map((category) => (
               <button
-                key={cat}
-                onClick={() => setSelectedCategory(cat)}
-                className={`px-4 py-2 rounded-lg capitalize font-medium transition-all duration-300 ${
-                  selectedCategory === cat
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-white/10 hover:bg-white/20'
+                key={category}
+                onClick={() => setSelectedCategory(category)}
+                className={`rounded-full px-5 py-2 text-sm font-semibold capitalize transition-all duration-300 ${
+                  selectedCategory === category
+                    ? 'bg-sky-600 text-white shadow-lg shadow-sky-600/20'
+                    : 'border border-white/10 bg-white/10 text-slate-700 hover:bg-white/20 dark:text-slate-200'
                 }`}
               >
-                {cat}
+                {category}
               </button>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Gallery Grid */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          {loading ? (
-            <div className="text-center py-12">
-              <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600"></div>
-            </div>
-          ) : filteredImages.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredImages.map((img, idx) => (
-                <motion.div
-                  key={idx}
-                  className="group relative overflow-hidden rounded-xl cursor-pointer bg-gradient-to-br from-blue-600 to-cyan-500 aspect-square"
-                  whileHover={{ scale: 1.05 }}
-                  onClick={() => setSelectedImage(img)}
-                >
-                  <img
-                    src={img.url}
-                    alt={img.caption}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                  />
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-300 flex items-end p-4">
-                    <div className="text-white opacity-0 group-hover:opacity-100 transition-opacity">
-                      <p className="font-semibold text-sm">{img.caption}</p>
-                      <p className="text-xs text-gray-300">{img.album}</p>
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
+      <section className="px-0 py-10">
+        <div className="relative overflow-hidden bg-slate-950 py-10 shadow-2xl shadow-slate-950/30 sm:py-14">
+          <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-20 bg-gradient-to-r from-slate-950 to-transparent sm:w-40" />
+          <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-20 bg-gradient-to-l from-slate-950 to-transparent sm:w-40" />
+
+          {loading && allImages.length === 0 ? (
+            <div className="flex h-64 items-center justify-center">
+              <div className="h-12 w-12 animate-spin rounded-full border-2 border-sky-500 border-t-transparent" />
             </div>
           ) : (
-            <div className="text-center py-12">
-              <p className="text-lg text-gray-600 dark:text-gray-400">No images found</p>
+            <div className="gallery-marquee overflow-hidden">
+              <div className="marquee-track flex w-max gap-4 px-4 sm:gap-6">
+                {duplicatedImages.map((image, index) => (
+                  <button
+                    key={`${image.url}-${index}`}
+                    type="button"
+                    onClick={() => setSelectedImage(image)}
+                    className="group relative h-48 w-72 shrink-0 overflow-hidden rounded-2xl bg-slate-900 text-left shadow-xl shadow-black/30 sm:h-64 sm:w-96 lg:h-72 lg:w-[28rem]"
+                  >
+                    <img
+                      src={image.url}
+                      alt={image.caption}
+                      className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+                      loading="lazy"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/75 via-transparent to-transparent opacity-80 transition-opacity duration-300 group-hover:opacity-95" />
+                    <div className="absolute inset-x-0 bottom-0 p-4 text-white">
+                      <p className="text-xs font-semibold uppercase tracking-[0.22em] text-sky-200">{image.album}</p>
+                      <p className="mt-2 text-lg font-bold">{image.caption}</p>
+                    </div>
+                  </button>
+                ))}
+              </div>
             </div>
           )}
         </div>
       </section>
 
-      {/* Lightbox */}
+      <section className="px-4 py-16 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl">
+          <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <span className="eyebrow">Album</span>
+              <h2 className="text-3xl font-bold sm:text-4xl">Event Photos</h2>
+            </div>
+            <p className="text-sm text-slate-500 dark:text-slate-400">
+              Showing {filteredImages.length} {filteredImages.length === 1 ? 'photo' : 'photos'}
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {filteredImages.map((image, index) => (
+              <motion.button
+                key={`${image.url}-grid-${index}`}
+                type="button"
+                className="group relative aspect-[4/3] overflow-hidden rounded-2xl bg-slate-950 shadow-xl shadow-slate-950/15"
+                onClick={() => setSelectedImage(image)}
+                initial={{ opacity: 0, y: 18 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.35, delay: Math.min(index * 0.03, 0.24) }}
+                viewport={{ once: true }}
+              >
+                <img
+                  src={image.url}
+                  alt={image.caption}
+                  className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+                  loading="lazy"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/75 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                <div className="absolute inset-x-0 bottom-0 translate-y-4 p-4 text-left text-white opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-sky-200">{image.album}</p>
+                  <p className="mt-1 font-bold">{image.caption}</p>
+                </div>
+              </motion.button>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {selectedImage && (
         <motion.div
-          className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4"
           onClick={() => setSelectedImage(null)}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
         >
           <motion.div
-            className="max-w-4xl w-full"
-            onClick={e => e.stopPropagation()}
-            initial={{ scale: 0.9 }}
-            animate={{ scale: 1 }}
+            className="w-full max-w-5xl"
+            onClick={(event) => event.stopPropagation()}
+            initial={{ scale: 0.94, y: 18 }}
+            animate={{ scale: 1, y: 0 }}
           >
-            <img src={selectedImage.url} alt={selectedImage.caption} className="w-full h-auto rounded-lg" />
+            <img
+              src={selectedImage.url}
+              alt={selectedImage.caption}
+              className="max-h-[82vh] w-full rounded-3xl object-contain shadow-2xl"
+            />
             <div className="mt-4 text-center">
-              <p className="text-white font-semibold">{selectedImage.caption}</p>
-              <p className="text-gray-400 text-sm">{selectedImage.album}</p>
+              <p className="font-semibold text-white">{selectedImage.caption}</p>
+              <p className="text-sm text-slate-400">{selectedImage.album}</p>
             </div>
           </motion.div>
         </motion.div>

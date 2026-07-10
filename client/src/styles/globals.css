@@ -286,3 +286,17 @@ html.dark .input-field {
 .marquee-track {
   animation: marquee 28s linear infinite;
 }
+
+.gallery-marquee .marquee-track {
+  animation-duration: 55s;
+}
+
+.gallery-marquee:hover .marquee-track {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gallery-marquee .marquee-track {
+    animation-play-state: paused;
+  }
+}
