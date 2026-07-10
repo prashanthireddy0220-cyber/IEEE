@@ -18,6 +18,7 @@ import saiChakradharPhoto from '../assets/team/sai-chakradhar.jpeg';
 import greeshmaPhoto from '../assets/team/greeshma.jpeg';
 import yasasviPhoto from '../assets/team/yasasvi.jpeg';
 import harshaVardhanPhoto from '../assets/team/harsha-vardhan.jpeg';
+import presidentPhoto from '../assets/team/president-face.jpeg';
 
 export const fallbackTeamMembers = [
   {
@@ -90,7 +91,7 @@ export const fallbackTeamMembers = [
     role: 'president',
     email: 'reddyajay510@gmail.com',
     phone: '9063931285',
-    photo: '',
+    photo: presidentPhoto,
     socialMedia: {
       linkedin: 'https://www.linkedin.com/in/ajay-reddy510',
       instagram: ''
