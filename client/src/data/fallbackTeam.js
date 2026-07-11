@@ -11,6 +11,11 @@ import aryaVardhanPhoto from '../assets/team/arya-vardhan.jpg';
 import hemaLathaPhoto from '../assets/team/hema-latha.jpg';
 import swathiPhoto from '../assets/team/swathi.jpg';
 import vinayReddyPhoto from '../assets/team/vinay-reddy.jpg';
+import ganeshKumarPhoto from '../assets/team/ganesh-kumar.jpg';
+import venkatVinayPhoto from '../assets/team/venkat-vinay.jpeg';
+import hariniPhoto from '../assets/team/harini.jpg';
+import nikithaPhoto from '../assets/team/nikitha.jpg';
+import sainithiPhoto from '../assets/team/sainithi.jpg';
 import keerthiPhoto from '../assets/team/keerthi.jpg';
 import chinnaSamyPhoto from '../assets/team/chinna-samy.jpeg';
 import krithigaPhoto from '../assets/team/krithiga.jpeg';
@@ -272,7 +277,7 @@ export const fallbackTeamMembers = [
     role: 'core-team',
     department: 'Event Coordinator Team ',
     phone: '',
-    photo: '',
+    photo: hariniPhoto,
     socialMedia: {
       linkedin: '',
       instagram: ''
@@ -285,7 +290,7 @@ export const fallbackTeamMembers = [
     role: 'core-team',
     department: 'Event Coordinator Team ',
     phone: '',
-    photo: '',
+    photo: nikithaPhoto,
     socialMedia: {
       linkedin: '',
       instagram: ''
@@ -298,7 +303,7 @@ export const fallbackTeamMembers = [
     role: 'core-team',
     department: 'Event Coordinator Team ',
     phone: '',
-    photo: '',
+    photo: ganeshKumarPhoto,
     socialMedia: {
       linkedin: '',
       instagram: ''
@@ -366,7 +371,7 @@ export const fallbackTeamMembers = [
     role: 'core-team',
     department: 'Content Team Lead',
     phone: '',
-    photo: '',
+    photo: venkatVinayPhoto,
     socialMedia: {
       linkedin: '',
       instagram: ''
@@ -380,6 +385,19 @@ export const fallbackTeamMembers = [
     department: 'Content Team ',
     phone: '',
     photo: '',
+    socialMedia: {
+      linkedin: '',
+      instagram: ''
+    },
+    bio: 'Crafting clear, engaging, and meaningful written content for chapter activities and outreach.'
+  },
+   {
+    _id: 'fallback-core-content-team-sainithi',
+    name: 'Sainithi',
+    role: 'core-team',
+    department: 'Content Team ',
+    phone: '',
+    photo: sainithiPhoto,
     socialMedia: {
       linkedin: '',
       instagram: ''

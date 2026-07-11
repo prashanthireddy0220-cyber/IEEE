@@ -27,12 +27,15 @@ export default function TeamMemberCard({ member }) {
     { icon: FiGithub, url: member?.socialMedia?.github, label: 'GitHub' },
     { icon: FiGlobe, url: member?.socialMedia?.portfolio, label: 'Portfolio' }
   ].filter((item) => item.url);
+  const coreTeamRoles = ['core-team', 'leads', 'secretary', 'vice-president'];
+  const isCoreTeamCard = coreTeamRoles.includes(member?.role);
+  const photoFrameClass = isCoreTeamCard ? 'h-64 sm:h-96' : 'h-52 sm:h-72';
 
   return (
     <motion.article className="premium-card group overflow-hidden" whileHover={{ y: -8 }}>
       <div className="overflow-hidden rounded-[22px] border border-slate-800 bg-slate-950 shadow-2xl shadow-slate-950/20 transition-transform duration-300 group-hover:-translate-y-2 sm:rounded-[28px]">
         {member?.photo ? (
-          <div className="relative h-52 overflow-hidden bg-slate-900 sm:h-72">
+          <div className={`relative ${photoFrameClass} overflow-hidden bg-slate-900`}>
             <img
               src={member.photo}
               alt={member.name}
@@ -48,7 +51,7 @@ export default function TeamMemberCard({ member }) {
             </div>
           </div>
         ) : (
-          <div className="relative flex h-52 items-end overflow-hidden rounded-[22px] bg-gradient-to-br from-sky-800 via-sky-700 to-cyan-500 sm:h-72 sm:rounded-[28px]">
+          <div className={`relative flex ${photoFrameClass} items-end overflow-hidden rounded-[22px] bg-gradient-to-br from-sky-800 via-sky-700 to-cyan-500 sm:rounded-[28px]`}>
             <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-transparent" />
             <div className="relative p-4 sm:p-6">
               <div className="rounded-[20px] bg-white/12 p-4 text-white backdrop-blur-md sm:rounded-[28px] sm:p-5">
