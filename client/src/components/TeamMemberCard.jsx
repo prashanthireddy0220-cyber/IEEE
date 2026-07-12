@@ -40,7 +40,7 @@ export default function TeamMemberCard({ member }) {
               src={member.photo}
               alt={member.name}
               className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-              style={{ objectPosition: member?.photoPosition || 'center center' }}
+              style={{ objectPosition: member?.photoPosition || 'center top' }}
             />
             <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/10 to-transparent" />
             <div className="absolute bottom-3 left-3 max-w-[78%] rounded-[16px] bg-slate-950/70 px-3 py-2 backdrop-blur-md sm:bottom-5 sm:left-5 sm:max-w-none sm:rounded-[24px] sm:px-4 sm:py-4">
