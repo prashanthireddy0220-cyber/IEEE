@@ -23,6 +23,7 @@ import dharaneeswarPhoto from '../assets/team/dharaneeswar.jpg';
 import keerthiPhoto from '../assets/team/keerthi.jpg';
 import chinnaSamyPhoto from '../assets/team/chinna-samy.jpeg';
 import krithigaPhoto from '../assets/team/krithiga.jpeg';
+import dhilipanRajkumarPhoto from '../assets/team/dhilipan-rajkumar.jpeg';
 import saiChakradharPhoto from '../assets/team/sai-chakradhar-card.jpeg';
 import greeshmaPhoto from '../assets/team/greeshma.jpeg';
 import yasasviPhoto from '../assets/team/yasasvi.jpeg';
@@ -52,6 +53,19 @@ export const fallbackTeamMembers = [
     socialMedia: {
       linkedin: 'https://www.linkedin.com/in/kiruthiga-pj?utm_source=share_via&utm_content=profile&utm_medium=member_ios',
       instagram: 'https://www.instagram.com/kiruthigapandii?igsh=ajdrNnFvYnR5bzZi&utm_source=qr'
+    },
+    bio: 'Supporting the chapter with faculty guidance, academic coordination, and student mentorship.'
+  },
+  {
+    _id: 'fallback-faculty-dhilipan-rajkumar',
+    name: 'Dr.C.Dhilipan Rajkumar',
+    role: 'faculty',
+    email: 't.dhiliphan@klu.ac.in',
+    phone: '9843972269',
+    photo: dhilipanRajkumarPhoto,
+    socialMedia: {
+      linkedin: 'https://www.linkedin.com/in/dhilipan-rajkumar-060a7722?utm_source=share_via&utm_content=profile&utm_medium=member_android',
+      instagram: 'https://www.instagram.com/dhilipanrajkumar?igsh=YjZ4YTFwcWhhdjJ4'
     },
     bio: 'Supporting the chapter with faculty guidance, academic coordination, and student mentorship.'
   },
