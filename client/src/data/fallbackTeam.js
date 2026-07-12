@@ -2,6 +2,7 @@ import prashanthiPhoto from '../assets/team/prashanthi.jpg';
 import chaitanyaPhoto from '../assets/team/chaitanya.jpg';
 import hoshithaPhoto from '../assets/team/hoshitha.jpg';
 import ajayPhoto from '../assets/team/ajay.png';
+import ajayVairamPhoto from '../assets/team/ajay-vairam.png';
 import prakyathPhoto from '../assets/team/prakyath.jpg';
 import anandPhoto from '../assets/team/anand.jpg';
 import saiCharanPhoto from '../assets/team/sai-charan.jpg';
@@ -14,8 +15,11 @@ import vinayReddyPhoto from '../assets/team/vinay-reddy.jpg';
 import ganeshKumarPhoto from '../assets/team/ganesh-kumar.jpg';
 import venkatVinayPhoto from '../assets/team/venkat-vinay.jpeg';
 import hariniPhoto from '../assets/team/harini.jpg';
+import pavanKumarReddyPhoto from '../assets/team/pavan-kumar-reddy.jpg';
+import tarunTejPhoto from '../assets/team/tarun-tej.jpg';
 import nikithaPhoto from '../assets/team/nikitha.jpg';
 import sainithiPhoto from '../assets/team/sainithi.jpg';
+import dharaneeswarPhoto from '../assets/team/dharaneeswar.jpg';
 import keerthiPhoto from '../assets/team/keerthi.jpg';
 import chinnaSamyPhoto from '../assets/team/chinna-samy.jpeg';
 import krithigaPhoto from '../assets/team/krithiga.jpeg';
@@ -152,7 +156,7 @@ export const fallbackTeamMembers = [
     email: '99240040829@klu.ac.in',
     department: 'Treasurer',
     phone: '',
-    photo: '',
+    photo: pavanKumarReddyPhoto,
     socialMedia: {
       linkedin: '',
       instagram: ''
@@ -209,7 +213,7 @@ export const fallbackTeamMembers = [
     role: 'core-team',
     department: 'Technical Team',
     phone: '',
-    photo: '',
+    photo: ajayVairamPhoto,
     socialMedia: {
       linkedin: '',
       instagram: ''
@@ -384,7 +388,7 @@ export const fallbackTeamMembers = [
     role: 'core-team',
     department: 'Content Team ',
     phone: '',
-    photo: '',
+    photo: tarunTejPhoto,
     socialMedia: {
       linkedin: '',
       instagram: ''
@@ -410,7 +414,7 @@ export const fallbackTeamMembers = [
     role: 'core-team',
     department: 'Content Team ',
     phone: '',
-    photo: '',
+    photo: dharaneeswarPhoto,
     socialMedia: {
       linkedin: '',
       instagram: ''
