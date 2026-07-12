@@ -38,7 +38,7 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [lightboxImage, setLightboxImage] = useState('');
   const navigate = useNavigate();
-  const coreTeamRoleOrder = ['faculty', 'chairman', 'student-chairperson', 'core-team'];
+  const coreTeamRoleOrder = ['sbc-counsellor', 'faculty', 'chairman', 'student-chairperson', 'core-team'];
 
   useEffect(() => {
     const fetchData = async () => {

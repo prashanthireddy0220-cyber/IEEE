@@ -12,6 +12,11 @@ const eduthonModules = import.meta.glob('../assets/gallery/eduthon-*.{jpg,jpeg,p
   import: 'default'
 });
 
+const coreTeamModules = import.meta.glob('../assets/gallery/core-team-2025-2026-*.{jpg,jpeg,png,webp}', {
+  eager: true,
+  import: 'default'
+});
+
 const createEventImages = (modules, album, category) =>
   Object.entries(modules)
     .sort(([firstPath], [secondPath]) => firstPath.localeCompare(secondPath))
@@ -24,7 +29,9 @@ const createEventImages = (modules, album, category) =>
 
 const hyperLaunchImages = createEventImages(hyperLaunchModules, 'Hyper Launch Event', 'hyper launch');
 const eduthonImages = createEventImages(eduthonModules, 'Eduthon Event', 'eduthon');
-const localEventImages = [...hyperLaunchImages, ...eduthonImages];
+const coreTeamImages = createEventImages(coreTeamModules, 'Core Team 2025 to 2026', 'core team 2025 to 2026');
+const localEventImages = [...hyperLaunchImages, ...eduthonImages, ...coreTeamImages];
+const isCoreTeamGalleryImage = (image) => image.category === 'core team 2025 to 2026';
 
 export default function Gallery() {
   const [galleries, setGalleries] = useState([]);
@@ -65,8 +72,10 @@ export default function Gallery() {
     ? allImages
     : allImages.filter((image) => image.category === selectedCategory);
   const carouselImages = filteredImages.length > 0 ? filteredImages : localEventImages;
-  const duplicatedImages = [...carouselImages, ...carouselImages];
+  const duplicatedImages = carouselImages.length > 1 ? [...carouselImages, ...carouselImages] : carouselImages;
   const categories = ['all', ...new Set(allImages.map((image) => image.category).filter(Boolean))];
+  const showCarousel = selectedCategory !== 'core team 2025 to 2026';
+  const isCoreTeamCategory = selectedCategory === 'core team 2025 to 2026';
 
   return (
     <div className="min-h-screen pt-20">
@@ -109,43 +118,45 @@ export default function Gallery() {
         </div>
       </section>
 
-      <section className="px-0 py-10">
-        <div className="relative overflow-hidden bg-slate-950 py-10 shadow-2xl shadow-slate-950/30 sm:py-14">
-          <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-20 bg-gradient-to-r from-slate-950 to-transparent sm:w-40" />
-          <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-20 bg-gradient-to-l from-slate-950 to-transparent sm:w-40" />
+      {showCarousel && (
+        <section className="px-0 py-10">
+          <div className="relative overflow-hidden bg-slate-950 py-10 shadow-2xl shadow-slate-950/30 sm:py-14">
+            <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-20 bg-gradient-to-r from-slate-950 to-transparent sm:w-40" />
+            <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-20 bg-gradient-to-l from-slate-950 to-transparent sm:w-40" />
 
-          {loading && allImages.length === 0 ? (
-            <div className="flex h-64 items-center justify-center">
-              <div className="h-12 w-12 animate-spin rounded-full border-2 border-sky-500 border-t-transparent" />
-            </div>
-          ) : (
-            <div className="gallery-marquee overflow-hidden">
-              <div className="marquee-track flex w-max gap-4 px-4 sm:gap-6">
-                {duplicatedImages.map((image, index) => (
-                  <button
-                    key={`${image.url}-${index}`}
-                    type="button"
-                    onClick={() => setSelectedImage(image)}
-                    className="group relative h-48 w-72 shrink-0 overflow-hidden rounded-2xl bg-slate-900 text-left shadow-xl shadow-black/30 sm:h-64 sm:w-96 lg:h-72 lg:w-[28rem]"
-                  >
-                    <img
-                      src={image.url}
-                      alt={image.caption}
-                      className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
-                      loading="lazy"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/75 via-transparent to-transparent opacity-80 transition-opacity duration-300 group-hover:opacity-95" />
-                    <div className="absolute inset-x-0 bottom-0 p-4 text-white">
-                      <p className="text-xs font-semibold uppercase tracking-[0.22em] text-sky-200">{image.album}</p>
-                      <p className="mt-2 text-lg font-bold">{image.caption}</p>
-                    </div>
-                  </button>
-                ))}
+            {loading && allImages.length === 0 ? (
+              <div className="flex h-64 items-center justify-center">
+                <div className="h-12 w-12 animate-spin rounded-full border-2 border-sky-500 border-t-transparent" />
               </div>
-            </div>
-          )}
-        </div>
-      </section>
+            ) : (
+              <div className="gallery-marquee overflow-hidden">
+                <div className="marquee-track flex w-max gap-4 px-4 sm:gap-6">
+                  {duplicatedImages.map((image, index) => (
+                    <button
+                      key={`${image.url}-${index}`}
+                      type="button"
+                      onClick={() => setSelectedImage(image)}
+                      className="group relative h-48 w-72 shrink-0 overflow-hidden rounded-2xl bg-transparent text-left shadow-xl shadow-black/30 sm:h-64 sm:w-96 lg:h-72 lg:w-[28rem]"
+                    >
+                      <img
+                        src={image.url}
+                        alt={image.caption}
+                        className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+                        loading="lazy"
+                      />
+                      <div className={`${isCoreTeamGalleryImage(image) ? 'hidden' : 'absolute inset-0 bg-gradient-to-t from-slate-950/75 via-transparent to-transparent opacity-80 transition-opacity duration-300 group-hover:opacity-95'}`} />
+                      <div className={`${isCoreTeamGalleryImage(image) ? 'hidden' : 'absolute inset-x-0 bottom-0 p-4 text-white'}`}>
+                        <p className="text-xs font-semibold uppercase tracking-[0.22em] text-sky-200">{image.album}</p>
+                        <p className="mt-2 text-lg font-bold">{image.caption}</p>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </section>
+      )}
 
       <section className="px-4 py-16 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-7xl">
@@ -159,12 +170,12 @@ export default function Gallery() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <div className={`${isCoreTeamCategory ? 'mx-auto grid max-w-6xl grid-cols-1 gap-8' : 'grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3'}`}>
             {filteredImages.map((image, index) => (
               <motion.button
                 key={`${image.url}-grid-${index}`}
                 type="button"
-                className="group relative aspect-[4/3] overflow-hidden rounded-2xl bg-slate-950 shadow-xl shadow-slate-950/15"
+                className={`group relative overflow-hidden rounded-2xl bg-transparent shadow-xl shadow-slate-950/15 ${isCoreTeamGalleryImage(image) ? 'aspect-[16/9] sm:rounded-3xl' : 'aspect-[4/3]'}`}
                 onClick={() => setSelectedImage(image)}
                 initial={{ opacity: 0, y: 18 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -177,8 +188,8 @@ export default function Gallery() {
                   className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
                   loading="lazy"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/75 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-                <div className="absolute inset-x-0 bottom-0 translate-y-4 p-4 text-left text-white opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+                <div className={`${isCoreTeamGalleryImage(image) ? 'hidden' : 'absolute inset-0 bg-gradient-to-t from-slate-950/75 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100'}`} />
+                <div className={`${isCoreTeamGalleryImage(image) ? 'hidden' : 'absolute inset-x-0 bottom-0 translate-y-4 p-4 text-left text-white opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100'}`}>
                   <p className="text-xs font-semibold uppercase tracking-[0.2em] text-sky-200">{image.album}</p>
                   <p className="mt-1 font-bold">{image.caption}</p>
                 </div>
