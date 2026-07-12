@@ -23,11 +23,11 @@ import dharaneeswarPhoto from '../assets/team/dharaneeswar.jpg';
 import keerthiPhoto from '../assets/team/keerthi.jpg';
 import chinnaSamyPhoto from '../assets/team/chinna-samy.jpeg';
 import krithigaPhoto from '../assets/team/krithiga.jpeg';
-import saiChakradharPhoto from '../assets/team/sai-chakradhar.jpeg';
+import saiChakradharPhoto from '../assets/team/sai-chakradhar-card.jpeg';
 import greeshmaPhoto from '../assets/team/greeshma.jpeg';
 import yasasviPhoto from '../assets/team/yasasvi.jpeg';
 import harshaVardhanPhoto from '../assets/team/harsha-vardhan.jpeg';
-import presidentPhoto from '../assets/team/president-face.jpeg';
+import presidentPhoto from '../assets/team/president-card.jpeg';
 
 export const fallbackTeamMembers = [
   {
