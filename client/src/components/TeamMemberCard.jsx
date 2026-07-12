@@ -29,7 +29,7 @@ export default function TeamMemberCard({ member }) {
   ].filter((item) => item.url);
   const coreTeamRoles = ['core-team', 'leads', 'secretary', 'vice-president'];
   const isCoreTeamCard = coreTeamRoles.includes(member?.role);
-  const photoFrameClass = isCoreTeamCard ? 'h-64 sm:h-96' : 'h-52 sm:h-72';
+  const photoFrameClass = isCoreTeamCard ? 'h-96 sm:h-[30rem]' : 'h-80 sm:h-96';
 
   return (
     <motion.article className="premium-card group overflow-hidden" whileHover={{ y: -8 }}>
