@@ -33,7 +33,7 @@ import presidentPhoto from '../assets/team/president-card.jpeg';
 export const fallbackTeamMembers = [
   {
     _id: 'fallback-faculty',
-    name: 'Dr.P.ChinnaSamy',
+    name: 'Dr. P.Chinnasamy',
     role: 'sbc-counsellor',
     phone: '9600281664',
     photo: chinnaSamyPhoto,
@@ -58,7 +58,7 @@ export const fallbackTeamMembers = [
   },
   {
     _id: 'fallback-faculty-dhilipan-rajkumar',
-    name: 'Dr.C.Dhilipan Rajkumar',
+    name: 'Dr.T.Dhiliphan Rajkumar',
     role: 'faculty',
     email: 't.dhiliphan@klu.ac.in',
     phone: '9843972269',
@@ -451,13 +451,36 @@ export const fallbackTeamMembers = [
 ];
 
 const obsoleteStandaloneTeamNames = new Set(['prashanthi', 'prashanhnti', 'prashanhti']);
+const teamNameOverrides = new Map([
+  ['dr.p.chinnasamy', 'Dr. P.Chinnasamy'],
+  ['dr. p.chinnasamy', 'Dr. P.Chinnasamy'],
+  ['dr.c.dhilipan rajkumar', 'Dr.T.Dhiliphan Rajkumar'],
+  ['dr.c.dhilipan raj kumar', 'Dr.T.Dhiliphan Rajkumar'],
+  ['dr.t.dhiliphan rajkumar', 'Dr.T.Dhiliphan Rajkumar'],
+  ['dr.t.dhiliphan raj kumar', 'Dr.T.Dhiliphan Rajkumar'],
+  ['t.dhiliphanraj kumar', 'Dr.T.Dhiliphan Rajkumar'],
+  ['t.diliphanraj kumar', 'Dr.T.Dhiliphan Rajkumar']
+]);
+
+const normalizeTeamName = (name) => name?.trim().toLowerCase() || '';
+
+function getDisplayNameOverride(name) {
+  return teamNameOverrides.get(normalizeTeamName(name));
+}
+
+function withDisplayNameOverrides(member) {
+  const overrideName = getDisplayNameOverride(member?.name);
+  return overrideName ? { ...member, name: overrideName } : member;
+}
 
 export function isObsoleteStandaloneMember(member) {
   return obsoleteStandaloneTeamNames.has(member?.name?.trim().toLowerCase());
 }
 
 export function mergeFallbackTeamMembers(members = []) {
-  const mergedMembers = members.filter((member) => !isObsoleteStandaloneMember(member));
+  const mergedMembers = members
+    .filter((member) => !isObsoleteStandaloneMember(member))
+    .map(withDisplayNameOverrides);
   const singleRoleFallbacks = new Set(['student-chairperson', 'president']);
 
   fallbackTeamMembers.forEach((fallbackMember) => {
@@ -468,11 +491,11 @@ export function mergeFallbackTeamMembers(members = []) {
       : mergedMembers.some(
           (member) =>
             member._id === fallbackMember._id ||
-            member.name?.trim().toLowerCase() === fallbackMember.name?.trim().toLowerCase()
+            normalizeTeamName(member.name) === normalizeTeamName(fallbackMember.name)
         );
 
     if (!exists) {
-      mergedMembers.push(fallbackMember);
+      mergedMembers.push(withDisplayNameOverrides(fallbackMember));
     }
   });
 
