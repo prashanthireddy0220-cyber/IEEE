@@ -10,3 +10,19 @@
 Server running on port 5000
 MongoDB connected
 Demo login users are ready. Password: password123
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node server/index.js`[39m
+Server running on port 5000
+MongoDB connected
+Demo login users are ready. Password: password123
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node server/index.js`[39m
+Server running on port 5000
+MongoDB connected
+[32m[nodemon] restarting due to changes...[39m
+Demo login users are ready. Password: password123
+[32m[nodemon] starting `node server/index.js`[39m
+Server running on port 5000
+MongoDB connected
+Demo login users are ready. Password: password123
