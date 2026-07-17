@@ -6,18 +6,20 @@ import { FiArrowRight, FiMail } from 'react-icons/fi';
 export default function ForgotPassword() {
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
+  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     setLoading(true);
     setMessage('');
+    setError('');
 
     try {
-      const response = await axios.post('/api/auth/forgot-password', { email });
+      const response = await axios.post('/api/auth/forgot-password', { email: email.trim().toLowerCase() });
       setMessage(response.data.message);
     } catch (error) {
-      setMessage('If the email is registered, password reset instructions will be sent.');
+      setError(error.response?.data?.message || 'Unable to send password reset email. Please try again later.');
     } finally {
       setLoading(false);
     }
@@ -37,6 +39,12 @@ export default function ForgotPassword() {
         {message && (
           <div className="mb-6 rounded-2xl bg-emerald-500/15 p-4 text-sm text-emerald-700 dark:text-emerald-300">
             {message}
+          </div>
+        )}
+
+        {error && (
+          <div className="mb-6 rounded-2xl bg-rose-500/15 p-4 text-sm text-rose-700 dark:text-rose-200">
+            {error}
           </div>
         )}
 
