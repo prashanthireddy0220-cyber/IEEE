@@ -14,6 +14,7 @@ import eventRoutes from './routes/events.js';
 import galleryRoutes from './routes/gallery.js';
 import teamRoutes from './routes/team.js';
 import contentRoutes from './routes/content.js';
+import { seedDemoUsers } from './utils/seedDemoUsers.js';
 
 dotenv.config();
 
@@ -23,7 +24,7 @@ const __dirname = path.dirname(__filename);
 const app = express();
 
 // Middleware
-const allowedOrigins = (process.env.CLIENT_ORIGIN || 'http://localhost:5173,http://127.0.0.1:5173')
+const allowedOrigins = (process.env.CLIENT_ORIGIN || 'http://localhost:5173,http://127.0.0.1:5173,https://ieee-jpc3.vercel.app')
   .split(',')
   .map((origin) => origin.trim())
   .filter(Boolean);
@@ -43,7 +44,10 @@ app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // MongoDB Connection
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/ieee-sbc')
-  .then(() => console.log('MongoDB connected'))
+  .then(async () => {
+    console.log('MongoDB connected');
+    await seedDemoUsers();
+  })
   .catch(err => console.log('MongoDB connection error:', err));
 
 // Routes

@@ -3,6 +3,19 @@ import axios from 'axios';
 
 const AuthContext = createContext();
 axios.defaults.withCredentials = true;
+axios.defaults.baseURL = import.meta.env.VITE_API_URL || '';
+
+const getApiErrorMessage = (error, fallbackMessage) => {
+  const data = error.response?.data;
+
+  if (typeof data?.message === 'string') return data.message;
+  if (typeof data === 'string' && data.trim()) return data;
+  if (error.code === 'ERR_NETWORK') {
+    return 'Unable to reach the server. Please try again later.';
+  }
+
+  return fallbackMessage;
+};
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -33,7 +46,7 @@ export const AuthProvider = ({ children }) => {
       setUser(userData);
       return userData;
     } catch (error) {
-      throw error.response?.data?.message || 'Invalid credentials';
+      throw getApiErrorMessage(error, 'Invalid credentials');
     }
   };
 
@@ -45,7 +58,7 @@ export const AuthProvider = ({ children }) => {
       }
       return response.data;
     } catch (error) {
-      throw error.response?.data?.message || 'Unable to process request';
+      throw getApiErrorMessage(error, 'Unable to process request');
     }
   };
 

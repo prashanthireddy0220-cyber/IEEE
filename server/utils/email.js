@@ -32,45 +32,47 @@ const getTransporter = async () => {
   return transporterPromise;
 };
 
-const buildStudentLoginEmail = ({ name }) => {
-  const subject = 'Welcome to IEEE Education Society';
+const buildAccountWelcomeEmail = ({ name }) => {
+  const subject = 'Welcome to KARE IEEE Education Society';
   const safeName = name || 'Student Member';
 
   return {
     subject,
     html: `
       <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #0f172a;">
-        <h2 style="color: #0f4c81; margin-bottom: 12px;">Welcome to IEEE Education Society</h2>
+        <h2 style="color: #0f4c81; margin-bottom: 12px;">Welcome to KARE IEEE Education Society</h2>
         <p>Hi ${safeName},</p>
-        <p>Welcome to the IEEE Education Society club. We are happy to have you as part of our student community.</p>
-        <p>You can now explore chapter updates, discover upcoming events, and take part in activities that support your technical growth and leadership journey.</p>
+        <p>Your account has been created successfully.</p>
+        <p>Welcome to the KARE IEEE Education Society. We are happy to have you as part of our student community.</p>
+        <p>You can now explore chapter updates, discover upcoming events, and take part in activities that support your technical growth, research mindset, and leadership journey.</p>
         <p>We are excited to build, learn, and grow together with you.</p>
-        <p style="margin-top: 20px;">Regards,<br />IEEE Education Society Team</p>
+        <p style="margin-top: 20px;">Regards,<br />KARE IEEE Education Society Team</p>
       </div>
     `,
     text: [
       `Hi ${safeName},`,
       '',
-      'Welcome to the IEEE Education Society club.',
+      'Your account has been created successfully.',
+      'Welcome to the KARE IEEE Education Society.',
       'We are happy to have you as part of our student community.',
-      'You can now explore chapter updates, discover upcoming events, and take part in activities that support your technical growth and leadership journey.',
+      'You can now explore chapter updates, discover upcoming events, and take part in activities that support your technical growth, research mindset, and leadership journey.',
       '',
       'Regards,',
-      'IEEE Education Society Team'
+      'KARE IEEE Education Society Team'
     ].join('\n')
   };
 };
 
-export const sendStudentLoginEmail = async ({ name, email }) => {
+export const sendAccountWelcomeEmail = async ({ name, email }) => {
   const transporter = await getTransporter();
 
   if (!transporter) {
-    console.warn('Student login email skipped: SMTP configuration is missing.');
+    console.warn('Account welcome email skipped: SMTP configuration is missing.');
     return false;
   }
 
   const from = process.env.EMAIL_FROM || process.env.SMTP_USER;
-  const message = buildStudentLoginEmail({ name });
+  const message = buildAccountWelcomeEmail({ name });
 
   await transporter.sendMail({
     from,

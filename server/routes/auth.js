@@ -1,8 +1,8 @@
 import express from 'express';
 import User from '../models/User.js';
 import {
+  sendAccountWelcomeEmail,
   sendPasswordResetEmail,
-  sendStudentLoginEmail,
   sendVerificationEmail
 } from '../utils/email.js';
 import {
@@ -24,6 +24,9 @@ const router = express.Router();
 const GENERIC_LOGIN_ERROR = 'Invalid credentials';
 const GENERIC_SIGNUP_MESSAGE = 'Request received. If this account already exists, use Login to continue.';
 const GENERIC_RESET_MESSAGE = 'If the email is registered, password reset instructions will be sent.';
+const ACCOUNT_EXISTS_MESSAGE = 'An account already exists for this email. Please login or use Forgot password.';
+const VERIFICATION_EMAIL_UNAVAILABLE_MESSAGE = 'Account verification email is not configured yet. Please contact the chapter admin.';
+const RESET_EMAIL_UNAVAILABLE_MESSAGE = 'Password reset email is not configured yet. Please contact the chapter admin.';
 const LOCK_ATTEMPTS = Number(process.env.LOGIN_LOCK_ATTEMPTS || 5);
 const LOCK_MINUTES = Number(process.env.LOGIN_LOCK_MINUTES || 15);
 const VERIFY_TOKEN_MINUTES = Number(process.env.VERIFY_TOKEN_MINUTES || 60);
@@ -119,6 +122,12 @@ const finishLogin = async (user, req, res) => {
   return res.json({ user: publicUser(user) });
 };
 
+const sendWelcomeEmailAfterRegistration = (user) => {
+  sendAccountWelcomeEmail({ name: user.name, email: user.email }).catch((error) => {
+    console.error('Account welcome email failed:', error.message);
+  });
+};
+
 // Register
 router.post('/register', signupLimiter, validateRegistrationPayload, async (req, res) => {
   try {
@@ -126,7 +135,7 @@ router.post('/register', signupLimiter, validateRegistrationPayload, async (req,
 
     const userExists = await User.findOne({ email });
     if (userExists) {
-      return res.status(202).json({ message: GENERIC_SIGNUP_MESSAGE });
+      return res.status(409).json({ message: ACCOUNT_EXISTS_MESSAGE });
     }
 
     const verificationToken = REQUIRE_EMAIL_VERIFICATION ? createRawToken() : '';
@@ -142,18 +151,22 @@ router.post('/register', signupLimiter, validateRegistrationPayload, async (req,
     await user.save();
 
     if (!REQUIRE_EMAIL_VERIFICATION) {
+      sendWelcomeEmailAfterRegistration(user);
       return finishLogin(user, req, res);
     }
 
     const emailSent = await sendVerificationEmail({ name: user.name, email: user.email, token: verificationToken });
     if (!emailSent) {
       console.warn('Email verification is required, but SMTP is not configured.');
+      await User.deleteOne({ _id: user._id });
+      return res.status(503).json({ message: VERIFICATION_EMAIL_UNAVAILABLE_MESSAGE });
     }
 
+    sendWelcomeEmailAfterRegistration(user);
     res.status(202).json({ message: GENERIC_SIGNUP_MESSAGE });
   } catch (error) {
     if (error.code === 11000) {
-      return res.status(202).json({ message: GENERIC_SIGNUP_MESSAGE });
+      return res.status(409).json({ message: ACCOUNT_EXISTS_MESSAGE });
     }
     console.error('Registration failed:', error.message);
     res.status(500).json({ message: 'Unable to process request' });
@@ -195,12 +208,6 @@ router.post('/login', loginLimiter, validateAuthPayload, async (req, res) => {
     }
 
     await finishLogin(user, req, res);
-
-    if (user.role === 'student') {
-      sendStudentLoginEmail({ name: user.name, email: user.email }).catch((error) => {
-        console.error('Student login email failed:', error.message);
-      });
-    }
   } catch (error) {
     console.error('Login failed:', error.message);
     res.status(500).json({ message: 'Unable to process request' });
@@ -255,9 +262,16 @@ router.post('/forgot-password', resetLimiter, async (req, res) => {
       user.passwordResetExpires = new Date(Date.now() + RESET_TOKEN_MINUTES * 60 * 1000);
       await user.save();
 
-      sendPasswordResetEmail({ name: user.name, email: user.email, token: resetToken }).catch((error) => {
+      let emailSent = false;
+      try {
+        emailSent = await sendPasswordResetEmail({ name: user.name, email: user.email, token: resetToken });
+      } catch (error) {
         console.error('Password reset email failed:', error.message);
-      });
+      }
+
+      if (!emailSent) {
+        return res.status(503).json({ message: RESET_EMAIL_UNAVAILABLE_MESSAGE });
+      }
     }
 
     res.json({ message: GENERIC_RESET_MESSAGE });
