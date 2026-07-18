@@ -10,7 +10,7 @@ const getApiErrorMessage = (error, fallbackMessage) => {
 
   if (typeof data?.message === 'string') return data.message;
   if (typeof data === 'string' && data.trim()) return data;
-  if (error.code === 'ERR_NETWORK') {
+  if (error.code === 'ERR_NETWORK' || !error.response) {
     return 'Unable to reach the server. Please try again later.';
   }
 
