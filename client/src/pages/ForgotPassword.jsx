@@ -19,7 +19,14 @@ export default function ForgotPassword() {
       const response = await axios.post('/api/auth/forgot-password', { email: email.trim().toLowerCase() });
       setMessage(response.data.message);
     } catch (error) {
-      setError(error.response?.data?.message || 'Unable to send password reset email. Please try again later.');
+      const serverMessage = error.response?.data?.message;
+      if (serverMessage) {
+        setError(serverMessage);
+      } else if (error.code === 'ERR_NETWORK' || !error.response) {
+        setError('Unable to reach the server. Please try again later.');
+      } else {
+        setError('Unable to send password reset email. Please try again later.');
+      }
     } finally {
       setLoading(false);
     }

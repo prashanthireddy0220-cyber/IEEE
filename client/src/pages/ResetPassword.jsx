@@ -12,14 +12,20 @@ export default function ResetPassword() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const token = searchParams.get('token') || '';
+  const hasResetToken = Boolean(token);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     setError('');
     setMessage('');
 
+    if (!hasResetToken) {
+      setError('This reset link is missing or invalid. Please request a new password reset link.');
+      return;
+    }
+
     if (password !== confirmPassword) {
-      setError('Invalid request');
+      setError('Passwords do not match.');
       return;
     }
 
@@ -35,7 +41,16 @@ export default function ResetPassword() {
       setPassword('');
       setConfirmPassword('');
     } catch (err) {
-      setError(err.response?.data?.message || 'Invalid request');
+      const serverMessage = err.response?.data?.message;
+      if (serverMessage === 'Invalid request') {
+        setError('This reset link is invalid or expired. Please request a new password reset link.');
+      } else if (serverMessage) {
+        setError(serverMessage);
+      } else if (err.code === 'ERR_NETWORK' || !err.response) {
+        setError('Unable to reach the server. Please try again later.');
+      } else {
+        setError('Unable to reset password. Please try again later.');
+      }
     } finally {
       setLoading(false);
     }
@@ -51,6 +66,11 @@ export default function ResetPassword() {
 
         {message && <div className="mb-6 rounded-2xl bg-emerald-500/15 p-4 text-sm text-emerald-700 dark:text-emerald-300">{message}</div>}
         {error && <div className="mb-6 rounded-2xl bg-rose-500/15 p-4 text-sm text-rose-700 dark:text-rose-300">{error}</div>}
+        {!hasResetToken && !error && (
+          <div className="mb-6 rounded-2xl bg-amber-500/15 p-4 text-sm text-amber-700 dark:text-amber-200">
+            Open the reset link from your email, or request a new password reset link.
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-5">
           {[
@@ -76,13 +96,19 @@ export default function ResetPassword() {
             </div>
           ))}
 
-          <button type="submit" disabled={loading || !token} className="btn btn-primary w-full disabled:opacity-70">
+          <button type="submit" disabled={loading || !hasResetToken} className="btn btn-primary w-full disabled:opacity-70">
             {loading ? 'Resetting...' : 'Reset password'}
             {!loading && <FiArrowRight size={16} />}
           </button>
         </form>
 
-        <Link to="/login" className="mt-6 block text-center text-sm font-semibold text-sky-600 dark:text-sky-300">
+        {!hasResetToken && (
+          <Link to="/forgot-password" className="mt-6 block text-center text-sm font-semibold text-sky-600 dark:text-sky-300">
+            Request a new reset link
+          </Link>
+        )}
+
+        <Link to="/login" className="mt-4 block text-center text-sm font-semibold text-sky-600 dark:text-sky-300">
           Back to login
         </Link>
       </div>
