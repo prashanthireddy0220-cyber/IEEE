@@ -49,7 +49,10 @@ export default function Register() {
       setSuccess(response.message || 'Request received. If this account already exists, use Login to continue.');
       setFormData({ name: '', email: '', password: '', confirmPassword: '' });
     } catch (err) {
-      setError(err);
+      const message = typeof err === 'string'
+        ? err
+        : err?.message || 'Unable to process request';
+      setError(message);
     } finally {
       setLoading(false);
     }
