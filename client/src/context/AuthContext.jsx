@@ -2,8 +2,11 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
 
 const AuthContext = createContext();
+const productionApiUrl = 'https://ieee-backend-ny9t.onrender.com';
+const apiBaseUrl = (import.meta.env.PROD ? productionApiUrl : import.meta.env.VITE_API_URL || productionApiUrl).replace(/\/$/, '');
+
 axios.defaults.withCredentials = true;
-axios.defaults.baseURL = import.meta.env.VITE_API_URL || '';
+axios.defaults.baseURL = apiBaseUrl;
 
 const getApiErrorMessage = (error, fallbackMessage) => {
   const data = error.response?.data;
