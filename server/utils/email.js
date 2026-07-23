@@ -1,5 +1,6 @@
 let transporterPromise;
-let transporterVerified = false;
+let verifiedTransporter;
+const DEFAULT_CLIENT_ORIGINS = 'http://localhost:5173,http://127.0.0.1:5173,https://ieee-jpc3.vercel.app';
 
 const parseBooleanEnv = (value, fallback = false) => {
   if (value === undefined || value === '') return fallback;
@@ -7,14 +8,16 @@ const parseBooleanEnv = (value, fallback = false) => {
 };
 
 const getEmailConfig = () => {
-  const host = process.env.SMTP_HOST;
+  const host = process.env.SMTP_HOST?.trim();
   const port = Number(process.env.SMTP_PORT || 587);
-  const user = process.env.SMTP_USER;
+  const user = process.env.SMTP_USER?.trim();
   const pass = process.env.SMTP_PASS;
+  const configuredFrom = (process.env.SMTP_FROM || process.env.EMAIL_FROM || '').trim();
+  const from = configuredFrom || user || '';
   const secure = parseBooleanEnv(process.env.SMTP_SECURE, port === 465);
-  const requireTLS = parseBooleanEnv(process.env.SMTP_REQUIRE_TLS, port === 587);
+  const requireTLS = parseBooleanEnv(process.env.SMTP_REQUIRE_TLS, port === 587 && !secure);
 
-  return { host, port, user, pass, secure, requireTLS };
+  return { host, port, user, pass, from, fromConfigured: Boolean(configuredFrom), secure, requireTLS };
 };
 
 const getSafeErrorDetails = (error) => ({
@@ -35,6 +38,35 @@ const logEmailSendIssue = (context, error) => {
   console.error(`${context} email failed:`, getSafeErrorDetails(error));
 };
 
+const validateEmailConfig = ({ host, port, user, pass, from, fromConfigured, secure, requireTLS }) => {
+  const issues = [];
+
+  if (!host) issues.push('SMTP_HOST is required');
+  if (!Number.isInteger(port) || port <= 0 || port > 65535) issues.push('SMTP_PORT must be a valid TCP port');
+  if (!user) issues.push('SMTP_USER is required');
+  if (!pass) issues.push('SMTP_PASS is required');
+  if (!from) issues.push('SMTP_FROM is required');
+  if (!fromConfigured) issues.push('SMTP_FROM is missing; falling back to SMTP_USER is not recommended for production');
+  if (port === 465 && !secure) issues.push('SMTP_SECURE must be true when SMTP_PORT is 465');
+  if (port === 587 && secure) issues.push('SMTP_SECURE should be false when SMTP_PORT is 587 because STARTTLS is used after connection');
+
+  if (issues.length > 0) {
+    logEmailConfigIssue('Invalid SMTP configuration.', {
+      issues,
+      hostConfigured: Boolean(host),
+      port,
+      userConfigured: Boolean(user),
+      passwordConfigured: Boolean(pass),
+      fromConfigured,
+      secure,
+      requireTLS
+    });
+    return false;
+  }
+
+  return true;
+};
+
 const escapeHtml = (value) => String(value)
   .replace(/&/g, '&amp;')
   .replace(/</g, '&lt;')
@@ -43,18 +75,15 @@ const escapeHtml = (value) => String(value)
   .replace(/'/g, '&#39;');
 
 const getTransporter = async () => {
+  if (verifiedTransporter) return verifiedTransporter;
   if (transporterPromise) return transporterPromise;
 
   transporterPromise = (async () => {
-    const { host, port, user, pass, secure, requireTLS } = getEmailConfig();
+    const emailConfig = getEmailConfig();
+    const { host, port, user, pass, secure, requireTLS } = emailConfig;
 
-    if (!host || !user || !pass || !Number.isInteger(port)) {
-      logEmailConfigIssue('SMTP_HOST, SMTP_PORT, SMTP_USER, and SMTP_PASS must be configured.', {
-        hasHost: Boolean(host),
-        hasUser: Boolean(user),
-        hasPassword: Boolean(pass),
-        port
-      });
+    if (!validateEmailConfig(emailConfig)) {
+      transporterPromise = undefined;
       return null;
     }
 
@@ -74,22 +103,31 @@ const getTransporter = async () => {
       socketTimeout: Number(process.env.SMTP_SOCKET_TIMEOUT_MS || 20000)
     });
 
+    console.info('Verifying SMTP transporter:', {
+      host,
+      port,
+      secure,
+      requireTLS,
+      userConfigured: Boolean(user),
+      fromConfigured: emailConfig.fromConfigured
+    });
+
     await transporter.verify();
-    transporterVerified = true;
+    verifiedTransporter = transporter;
     console.info('SMTP transporter verified:', {
       host,
       port,
       secure,
       requireTLS,
       userConfigured: Boolean(user),
-      fromConfigured: Boolean(process.env.EMAIL_FROM)
+      fromConfigured: emailConfig.fromConfigured
     });
 
-    return transporter;
+    return verifiedTransporter;
   })().catch((error) => {
     logEmailConfigIssue('Transporter setup or verification failed.', getSafeErrorDetails(error));
     transporterPromise = undefined;
-    transporterVerified = false;
+    verifiedTransporter = undefined;
     return null;
   });
 
@@ -139,19 +177,41 @@ export const sendAccountWelcomeEmail = async ({ name, email }) => {
   });
 };
 
-const getClientUrl = () => process.env.CLIENT_URL || process.env.CLIENT_ORIGIN?.split(',')[0] || 'http://localhost:5173';
+const getConfiguredClientUrl = () => process.env.CLIENT_URL || (process.env.CLIENT_ORIGIN || DEFAULT_CLIENT_ORIGINS).split(',')[0];
+
+const getAllowedClientOrigins = () => (process.env.CLIENT_ORIGIN || DEFAULT_CLIENT_ORIGINS)
+  .split(',')
+  .map((origin) => origin.trim().replace(/\/$/, ''))
+  .filter(Boolean);
+
+const getClientUrl = (requestOrigin) => {
+  const configuredClientUrl = getConfiguredClientUrl().replace(/\/$/, '');
+  const normalizedRequestOrigin = typeof requestOrigin === 'string'
+    ? requestOrigin.trim().replace(/\/$/, '')
+    : '';
+
+  if (!normalizedRequestOrigin) return configuredClientUrl;
+
+  const allowedOrigins = getAllowedClientOrigins();
+  if (allowedOrigins.includes(normalizedRequestOrigin)) {
+    return normalizedRequestOrigin;
+  }
+
+  return configuredClientUrl;
+};
 
 const sendMail = async ({ to, subject, text, html }) => {
   const transporter = await getTransporter();
+  const { from } = getEmailConfig();
 
   if (!transporter) {
-    console.warn(`${subject} email skipped: SMTP configuration is missing.`);
+    console.warn(`${subject} email skipped: SMTP transporter is unavailable.`);
     return false;
   }
 
   try {
-    await transporter.sendMail({
-      from: process.env.EMAIL_FROM || process.env.SMTP_USER,
+    const info = await transporter.sendMail({
+      from,
       to,
       subject,
       text,
@@ -160,7 +220,9 @@ const sendMail = async ({ to, subject, text, html }) => {
 
     console.info(`${subject} email sent:`, {
       to,
-      transporterVerified
+      messageId: info.messageId,
+      accepted: info.accepted,
+      rejected: info.rejected
     });
     return true;
   } catch (error) {
@@ -169,8 +231,8 @@ const sendMail = async ({ to, subject, text, html }) => {
   }
 };
 
-export const sendVerificationEmail = async ({ name, email, token }) => {
-  const verifyUrl = `${getClientUrl()}/verify-email?token=${encodeURIComponent(token)}`;
+export const sendVerificationEmail = async ({ name, email, token, clientOrigin }) => {
+  const verifyUrl = `${getClientUrl(clientOrigin)}/verify-email?token=${encodeURIComponent(token)}`;
   const displayName = name || 'IEEE Member';
   const safeName = escapeHtml(displayName);
   const safeVerifyUrl = escapeHtml(verifyUrl);
@@ -190,8 +252,8 @@ export const sendVerificationEmail = async ({ name, email, token }) => {
   });
 };
 
-export const sendPasswordResetEmail = async ({ name, email, token }) => {
-  const resetUrl = `${getClientUrl()}/reset-password?token=${encodeURIComponent(token)}`;
+export const sendPasswordResetEmail = async ({ name, email, token, clientOrigin }) => {
+  const resetUrl = `${getClientUrl(clientOrigin)}/reset-password?token=${encodeURIComponent(token)}`;
   const displayName = name || 'IEEE Member';
   const safeName = escapeHtml(displayName);
   const safeResetUrl = escapeHtml(resetUrl);

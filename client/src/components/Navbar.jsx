@@ -1,7 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { FiLogIn, FiLogOut, FiMenu, FiMoon, FiSun, FiX } from 'react-icons/fi';
+import {
+  FiAward,
+  FiCalendar,
+  FiHome,
+  FiImage,
+  FiLogIn,
+  FiLogOut,
+  FiMenu,
+  FiMoon,
+  FiSun,
+  FiUsers,
+  FiX
+} from 'react-icons/fi';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
 import { roleConfig } from '../data/siteContent';
@@ -35,6 +47,14 @@ export default function Navbar() {
     { label: 'Achievements', path: '/achievements' },
     { label: 'Contact', path: '/contact' }
   ];
+  const dashboardMenuItems = [
+    { icon: FiHome, label: 'Overview', path: '/dashboard' },
+    { icon: FiCalendar, label: 'Events', path: '/dashboard/events' },
+    { icon: FiImage, label: 'Gallery', path: '/dashboard/gallery' },
+    { icon: FiUsers, label: 'Team', path: '/dashboard/team' },
+    { icon: FiAward, label: 'Achievements', path: '/dashboard/achievements' }
+  ];
+  const isDashboard = location.pathname.startsWith('/dashboard');
 
   const shellClass = isScrolled || isOpen
     ? 'glassmorphism border border-white/40 shadow-[0_18px_50px_rgba(15,23,42,0.08)]'
@@ -125,27 +145,58 @@ export default function Navbar() {
 
         {isOpen && (
           <motion.div
-            className="space-y-3 border-t border-white/10 bg-slate-950/65 px-4 pb-5 pt-4 backdrop-blur-2xl lg:hidden"
+            className="max-h-[calc(100vh-104px)] space-y-3 overflow-y-auto border-t border-white/10 bg-slate-950/80 px-4 pb-5 pt-4 backdrop-blur-2xl lg:hidden"
             initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
           >
-            {menuItems.map((item) => (
-              <Link
-                key={item.path}
-                to={item.path}
-                className="block rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-semibold text-white transition-all duration-300 hover:bg-white/10"
-              >
-                {item.label}
-              </Link>
-            ))}
+            <div className="grid gap-2">
+              {menuItems.map((item) => {
+                const isActive = location.pathname === item.path;
+                return (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    className={`block rounded-2xl border px-4 py-3 text-sm font-semibold text-white transition-all duration-300 ${
+                      isActive ? 'border-sky-400/50 bg-sky-500/25' : 'border-white/10 bg-white/5 hover:bg-white/10'
+                    }`}
+                  >
+                    {item.label}
+                  </Link>
+                );
+              })}
+            </div>
 
             {user ? (
               <div className="grid gap-3 pt-2">
-                <Link to="/dashboard" className="btn btn-secondary w-full">
-                  {roleConfig[user.role]?.label || 'Dashboard'}
-                </Link>
+                {isDashboard ? (
+                  <div className="grid gap-2 border-t border-white/10 pt-3">
+                    <div className="px-1 text-xs font-semibold uppercase tracking-[0.22em] text-cyan-200">
+                      Dashboard
+                    </div>
+                    {dashboardMenuItems.map((item) => {
+                      const isActive = location.pathname === item.path;
+                      return (
+                        <Link
+                          key={item.path}
+                          to={item.path}
+                          className={`flex items-center gap-3 rounded-2xl border px-4 py-3 text-sm font-semibold text-white transition-all duration-300 ${
+                            isActive ? 'border-sky-400/50 bg-sky-500/25' : 'border-white/10 bg-white/5 hover:bg-white/10'
+                          }`}
+                        >
+                          <item.icon size={16} />
+                          {item.label}
+                        </Link>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <Link to="/dashboard" className="btn btn-secondary w-full">
+                    {roleConfig[user.role]?.label || 'Dashboard'}
+                  </Link>
+                )}
                 <button
                   onClick={() => {
+                    setIsOpen(false);
                     logout();
                     navigate('/');
                   }}

@@ -9,7 +9,6 @@ import {
   FiHome,
   FiImage,
   FiLogOut,
-  FiMenu,
   FiUsers,
   FiX
 } from 'react-icons/fi';
@@ -53,27 +52,10 @@ export default function Dashboard() {
   if (!user) return null;
 
   return (
-    <div className="section-shell min-h-screen pt-24 sm:pt-28">
+    <div className="section-shell min-h-screen pt-20 sm:pt-24 lg:pt-28">
       <div className="section-frame pb-10">
-        <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between lg:hidden">
-          <button onClick={() => setSidebarOpen(true)} className="btn btn-outline">
-            <FiMenu size={16} />
-            Menu
-          </button>
-          <button
-            onClick={() => {
-              logout();
-              navigate('/');
-            }}
-            className="btn btn-outline"
-          >
-            <FiLogOut size={16} />
-            Logout
-          </button>
-        </div>
-
         <div className="grid gap-6 lg:grid-cols-[290px_1fr]">
-          <aside className={`${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} fixed bottom-2 left-0 top-[92px] z-[70] w-full max-w-[calc(100vw-1rem)] bg-slate-950/30 p-2 backdrop-blur-sm transition-transform duration-300 sm:top-[96px] sm:max-w-[320px] sm:p-4 lg:static lg:z-auto lg:w-auto lg:max-w-none lg:translate-x-0 lg:bg-transparent lg:p-0`}>
+          <aside className={`${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} fixed bottom-2 left-0 top-[92px] z-[70] hidden w-full max-w-[calc(100vw-1rem)] bg-slate-950/30 p-2 backdrop-blur-sm transition-transform duration-300 sm:top-[96px] sm:max-w-[320px] sm:p-4 lg:static lg:z-auto lg:block lg:w-auto lg:max-w-none lg:translate-x-0 lg:bg-transparent lg:p-0`}>
             <div className="glassmorphism flex h-full max-h-[calc(100vh-100px)] flex-col overflow-y-auto rounded-[28px] p-4 sm:max-h-[calc(100vh-112px)] sm:rounded-[32px] sm:p-6 lg:max-h-none">
               <div className="mb-6 flex items-center justify-between lg:hidden">
                 <div className="text-lg font-bold">Dashboard</div>

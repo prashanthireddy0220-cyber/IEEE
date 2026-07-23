@@ -1,6 +1,6 @@
+import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
-import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import fileUpload from 'express-fileupload';
 import cookieParser from 'cookie-parser';
@@ -15,8 +15,6 @@ import galleryRoutes from './routes/gallery.js';
 import teamRoutes from './routes/team.js';
 import contentRoutes from './routes/content.js';
 import { seedDemoUsers } from './utils/seedDemoUsers.js';
-
-dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

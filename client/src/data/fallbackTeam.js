@@ -35,6 +35,7 @@ export const fallbackTeamMembers = [
     _id: 'fallback-faculty',
     name: 'Dr. P.Chinnasamy',
     role: 'sbc-counsellor',
+    email: 'chinnasamyponnusamy@gmail.com',
     phone: '9600281664',
     photo: chinnaSamyPhoto,
     socialMedia: {

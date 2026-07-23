@@ -25,8 +25,8 @@ const GENERIC_LOGIN_ERROR = 'Invalid credentials';
 const GENERIC_SIGNUP_MESSAGE = 'Request received. If this account already exists, use Login to continue.';
 const GENERIC_RESET_MESSAGE = 'If the email is registered, password reset instructions will be sent.';
 const ACCOUNT_EXISTS_MESSAGE = 'An account already exists for this email. Please login or use Forgot password.';
-const VERIFICATION_EMAIL_UNAVAILABLE_MESSAGE = 'Account verification email is not configured yet. Please contact the chapter admin.';
-const RESET_EMAIL_UNAVAILABLE_MESSAGE = 'Password reset email is not configured yet. Please contact the chapter admin.';
+const VERIFICATION_EMAIL_UNAVAILABLE_MESSAGE = 'Unable to send the verification email right now. Please contact the chapter admin.';
+const RESET_EMAIL_UNAVAILABLE_MESSAGE = 'Unable to send password reset email right now. Please contact the chapter admin.';
 const LOCK_ATTEMPTS = Number(process.env.LOGIN_LOCK_ATTEMPTS || 5);
 const LOCK_MINUTES = Number(process.env.LOGIN_LOCK_MINUTES || 15);
 const VERIFY_TOKEN_MINUTES = Number(process.env.VERIFY_TOKEN_MINUTES || 60);
@@ -63,6 +63,8 @@ const getClientIp = (req) => {
   const ip = Array.isArray(forwardedFor) ? forwardedFor[0] : forwardedFor?.split(',')[0];
   return (ip || req.ip || req.socket?.remoteAddress || '').trim();
 };
+
+const getRequestOrigin = (req) => req.headers.origin || '';
 
 const verifyCaptchaIfRequired = async (req, user) => {
   const captchaSecret = process.env.CAPTCHA_SECRET;
@@ -155,9 +157,14 @@ router.post('/register', signupLimiter, validateRegistrationPayload, async (req,
       return finishLogin(user, req, res);
     }
 
-    const emailSent = await sendVerificationEmail({ name: user.name, email: user.email, token: verificationToken });
+    const emailSent = await sendVerificationEmail({
+      name: user.name,
+      email: user.email,
+      token: verificationToken,
+      clientOrigin: getRequestOrigin(req)
+    });
     if (!emailSent) {
-      console.warn('Email verification is required, but SMTP is not configured.');
+      console.warn('Email verification is required, but email delivery failed.');
       await User.deleteOne({ _id: user._id });
       return res.status(503).json({ message: VERIFICATION_EMAIL_UNAVAILABLE_MESSAGE });
     }
@@ -264,7 +271,12 @@ router.post('/forgot-password', resetLimiter, async (req, res) => {
 
       let emailSent = false;
       try {
-        emailSent = await sendPasswordResetEmail({ name: user.name, email: user.email, token: resetToken });
+        emailSent = await sendPasswordResetEmail({
+          name: user.name,
+          email: user.email,
+          token: resetToken,
+          clientOrigin: getRequestOrigin(req)
+        });
       } catch (error) {
         console.error('Password reset email failed:', error.message);
       }

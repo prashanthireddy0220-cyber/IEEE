@@ -218,42 +218,6 @@ export default function Home() {
       <section className="section-shell py-24">
         <div className="section-frame">
           <motion.div
-            className="premium-card overflow-hidden p-8 sm:p-10"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.55 }}
-            viewport={{ once: true }}
-          >
-            <div className="grid gap-8 lg:grid-cols-[0.82fr_1.18fr]">
-              <div>
-                <span className="eyebrow">Admin Experience</span>
-                <h2 className="mt-4 text-4xl font-bold">A powerful role-based system for chapter operations.</h2>
-                <p className="mt-5 text-base leading-8 text-slate-600 dark:text-slate-300">
-                  Chairman, faculty, core team, and student chairperson each get a structured workflow for approvals, publishing, reports, gallery management, and homepage updates.
-                </p>
-              </div>
-
-              <div className="grid gap-4 sm:grid-cols-2">
-                {[
-                  { title: 'Events Management', description: 'Upcoming and past events, registration links, speakers, timelines, and auto-archival control.' },
-                  { title: 'Gallery System', description: 'Album creation, event-wise categorization, image uploads, search, and lightbox-ready previews.' },
-                  { title: 'Team Management', description: 'Core team and faculty profile updates with role metadata and social presence.' },
-                  { title: 'Announcements & Analytics', description: 'Featured homepage content, approvals, notices, and chapter performance visibility.' }
-                ].map((item) => (
-                  <div key={item.title} className="glassmorphism-sm rounded-[24px] p-5">
-                    <h3 className="text-lg font-bold">{item.title}</h3>
-                    <p className="mt-3 text-sm leading-7 text-slate-600 dark:text-slate-300">{item.description}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      <section className="section-shell py-24">
-        <div className="section-frame">
-          <motion.div
             className="mb-14 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
