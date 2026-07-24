@@ -25,8 +25,6 @@ const GENERIC_LOGIN_ERROR = 'Invalid credentials';
 const GENERIC_SIGNUP_MESSAGE = 'Request received. If this account already exists, use Login to continue.';
 const GENERIC_RESET_MESSAGE = 'If the email is registered, password reset instructions will be sent.';
 const ACCOUNT_EXISTS_MESSAGE = 'An account already exists for this email. Please login or use Forgot password.';
-const VERIFICATION_EMAIL_UNAVAILABLE_MESSAGE = 'Unable to send the verification email right now. Please contact the chapter admin.';
-const RESET_EMAIL_UNAVAILABLE_MESSAGE = 'Unable to send password reset email right now. Please contact the chapter admin.';
 const LOCK_ATTEMPTS = Number(process.env.LOGIN_LOCK_ATTEMPTS || 5);
 const LOCK_MINUTES = Number(process.env.LOGIN_LOCK_MINUTES || 15);
 const VERIFY_TOKEN_MINUTES = Number(process.env.VERIFY_TOKEN_MINUTES || 60);
@@ -166,14 +164,15 @@ router.post('/register', signupLimiter, validateRegistrationPayload, async (req,
     });
     await user.save();
 
+    const welcomeEmailSent = await sendWelcomeEmailAfterRegistration(user);
+    if (!welcomeEmailSent) {
+      console.warn('Registration completed, but welcome email delivery failed.', {
+        userId: user._id.toString(),
+        email: user.email
+      });
+    }
+
     if (!REQUIRE_EMAIL_VERIFICATION) {
-      const welcomeEmailSent = await sendWelcomeEmailAfterRegistration(user);
-      if (!welcomeEmailSent) {
-        console.warn('Registration completed, but welcome email delivery failed.', {
-          userId: user._id.toString(),
-          email: user.email
-        });
-      }
       return finishLogin(user, req, res, {
         email: {
           welcomeSent: welcomeEmailSent
@@ -188,13 +187,19 @@ router.post('/register', signupLimiter, validateRegistrationPayload, async (req,
       clientOrigin: getRequestOrigin(req)
     });
     if (!emailSent) {
-      console.warn('Email verification is required, but email delivery failed.');
-      await User.deleteOne({ _id: user._id });
-      return res.status(503).json({ message: VERIFICATION_EMAIL_UNAVAILABLE_MESSAGE });
+      console.warn('Email verification delivery failed after account creation.', {
+        userId: user._id.toString(),
+        email: user.email
+      });
     }
 
-    await sendWelcomeEmailAfterRegistration(user);
-    res.status(202).json({ message: GENERIC_SIGNUP_MESSAGE });
+    res.status(202).json({
+      message: GENERIC_SIGNUP_MESSAGE,
+      email: {
+        welcomeSent: welcomeEmailSent,
+        verificationSent: emailSent
+      }
+    });
   } catch (error) {
     if (error.code === 11000) {
       return res.status(409).json({ message: ACCOUNT_EXISTS_MESSAGE });
@@ -318,10 +323,14 @@ router.post('/forgot-password', resetLimiter, async (req, res) => {
         userId: user._id.toString(),
         email: user.email
       });
-      return res.status(503).json({ message: RESET_EMAIL_UNAVAILABLE_MESSAGE });
     }
 
-    res.json({ message: GENERIC_RESET_MESSAGE });
+    res.json({
+      message: GENERIC_RESET_MESSAGE,
+      email: {
+        resetSent: emailSent
+      }
+    });
   } catch (error) {
     console.error('Forgot password failed:', error.message);
     res.status(500).json({ message: 'Unable to process request' });

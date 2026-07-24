@@ -1,5 +1,6 @@
 let transporterPromise;
 let verifiedTransporter;
+let lastTransporterError;
 const DEFAULT_CLIENT_ORIGINS = 'http://localhost:5173,http://127.0.0.1:5173,https://ieee-jpc3.vercel.app';
 
 const parseBooleanEnv = (value, fallback = false) => {
@@ -8,24 +9,39 @@ const parseBooleanEnv = (value, fallback = false) => {
 };
 
 const getEmailConfig = () => {
-  const host = process.env.SMTP_HOST?.trim();
+  const host = (process.env.SMTP_HOST || 'smtp.gmail.com').trim();
   const port = Number(process.env.SMTP_PORT || 587);
   const user = process.env.SMTP_USER?.trim();
   const pass = process.env.SMTP_PASS?.trim();
-  const configuredFrom = (process.env.SMTP_FROM || process.env.EMAIL_FROM || '').trim();
+  const configuredFrom = (process.env.EMAIL_FROM || process.env.SMTP_FROM || '').trim();
   const from = configuredFrom || user || '';
-  const secure = parseBooleanEnv(process.env.SMTP_SECURE, port === 465);
-  const requireTLS = parseBooleanEnv(process.env.SMTP_REQUIRE_TLS, port === 587 && !secure);
+  const secure = parseBooleanEnv(process.env.SMTP_SECURE, false);
+  const requireTLS = parseBooleanEnv(process.env.SMTP_REQUIRE_TLS, true);
 
-  return { host, port, user, pass, from, fromConfigured: Boolean(configuredFrom), secure, requireTLS };
+  return { host, port, user, pass, from, emailFrom: configuredFrom, fromConfigured: Boolean(configuredFrom), secure, requireTLS };
 };
 
 const getSafeErrorDetails = (error) => ({
   message: error.message,
   code: error.code,
   command: error.command,
-  responseCode: error.responseCode
+  responseCode: error.responseCode,
+  response: error.response
 });
+
+const getSafeEmailConfigSummary = () => {
+  const { host, port, user, from, emailFrom, secure, requireTLS } = getEmailConfig();
+
+  return {
+    SMTP_HOST: host,
+    SMTP_PORT: port,
+    SMTP_USER_EXISTS: Boolean(user),
+    SMTP_SECURE: secure,
+    SMTP_REQUIRE_TLS: requireTLS,
+    EMAIL_FROM: emailFrom || from,
+    CLIENT_URL: getConfiguredClientUrl()
+  };
+};
 
 const logEmailConfigIssue = (message, details = {}) => {
   console.error('SMTP email configuration error:', {
@@ -46,8 +62,11 @@ const validateEmailConfig = ({ host, port, user, pass, from, fromConfigured, sec
   if (!Number.isInteger(port) || port <= 0 || port > 65535) issues.push('SMTP_PORT must be a valid TCP port');
   if (!user) issues.push('SMTP_USER is required');
   if (!pass) issues.push('SMTP_PASS is required');
-  if (!from) issues.push('SMTP_FROM or SMTP_USER is required');
-  if (!fromConfigured) warnings.push('SMTP_FROM is missing; falling back to SMTP_USER');
+  if (!from) issues.push('EMAIL_FROM or SMTP_USER is required');
+  if (!fromConfigured) warnings.push('EMAIL_FROM is missing; falling back to SMTP_USER');
+  if (host === 'smtp.gmail.com' && port !== 587) issues.push('Gmail SMTP_PORT must be 587');
+  if (host === 'smtp.gmail.com' && secure) issues.push('Gmail SMTP_SECURE must be false for port 587 STARTTLS');
+  if (host === 'smtp.gmail.com' && !requireTLS) issues.push('Gmail SMTP_REQUIRE_TLS must be true');
   if (port === 465 && !secure) issues.push('SMTP_SECURE must be true when SMTP_PORT is 465');
   if (port === 587 && secure) issues.push('SMTP_SECURE should be false when SMTP_PORT is 587 because STARTTLS is used after connection');
 
@@ -95,6 +114,8 @@ const getTransporter = async () => {
     const emailConfig = getEmailConfig();
     const { host, port, user, pass, secure, requireTLS } = emailConfig;
 
+    console.info('SMTP environment loaded:', getSafeEmailConfigSummary());
+
     if (!validateEmailConfig(emailConfig)) {
       transporterPromise = undefined;
       return null;
@@ -127,6 +148,7 @@ const getTransporter = async () => {
 
     await transporter.verify();
     verifiedTransporter = transporter;
+    lastTransporterError = undefined;
     console.info('SMTP transporter verified:', {
       host,
       port,
@@ -138,13 +160,30 @@ const getTransporter = async () => {
 
     return verifiedTransporter;
   })().catch((error) => {
-    logEmailConfigIssue('Transporter setup or verification failed.', getSafeErrorDetails(error));
+    lastTransporterError = getSafeErrorDetails(error);
+    logEmailConfigIssue('Transporter setup or verification failed.', lastTransporterError);
     transporterPromise = undefined;
     verifiedTransporter = undefined;
     return null;
   });
 
   return transporterPromise;
+};
+
+export const verifySmtpTransporter = async ({ reset = false } = {}) => {
+  if (reset) {
+    transporterPromise = undefined;
+    verifiedTransporter = undefined;
+    lastTransporterError = undefined;
+  }
+
+  const transporter = await getTransporter();
+  return {
+    success: Boolean(transporter),
+    smtpConnected: Boolean(transporter),
+    config: getSafeEmailConfigSummary(),
+    error: transporter ? undefined : lastTransporterError || { message: 'SMTP transporter is unavailable' }
+  };
 };
 
 const buildAccountWelcomeEmail = ({ name }) => {
@@ -218,7 +257,11 @@ const sendMail = async ({ to, subject, text, html }) => {
   const { from } = getEmailConfig();
 
   if (!transporter) {
-    console.warn(`${subject} email skipped: SMTP transporter is unavailable.`);
+    console.warn(`${subject} email skipped: SMTP transporter is unavailable.`, {
+      to,
+      from,
+      error: lastTransporterError
+    });
     return false;
   }
 

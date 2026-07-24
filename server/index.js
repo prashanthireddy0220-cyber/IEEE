@@ -15,6 +15,7 @@ import galleryRoutes from './routes/gallery.js';
 import teamRoutes from './routes/team.js';
 import contentRoutes from './routes/content.js';
 import { seedDemoUsers } from './utils/seedDemoUsers.js';
+import { verifySmtpTransporter } from './utils/email.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -61,7 +62,41 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'Server is running' });
 });
 
+app.get('/api/debug/email', async (req, res) => {
+  const result = await verifySmtpTransporter({ reset: true });
+  if (result.success) {
+    return res.json({
+      success: true,
+      smtpConnected: true
+    });
+  }
+
+  return res.status(500).json({
+    success: false,
+    smtpConnected: false,
+    error: result.error
+  });
+});
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
+  verifySmtpTransporter({ reset: true })
+    .then((result) => {
+      if (result.success) {
+        console.info('SMTP startup verification successful:', result.config);
+        return;
+      }
+
+      console.error('SMTP startup verification failed:', {
+        config: result.config,
+        error: result.error
+      });
+    })
+    .catch((error) => {
+      console.error('SMTP startup verification crashed:', {
+        message: error.message,
+        code: error.code
+      });
+    });
 });
