@@ -11,7 +11,7 @@ const getEmailConfig = () => {
   const host = process.env.SMTP_HOST?.trim();
   const port = Number(process.env.SMTP_PORT || 587);
   const user = process.env.SMTP_USER?.trim();
-  const pass = process.env.SMTP_PASS;
+  const pass = process.env.SMTP_PASS?.trim();
   const configuredFrom = (process.env.SMTP_FROM || process.env.EMAIL_FROM || '').trim();
   const from = configuredFrom || user || '';
   const secure = parseBooleanEnv(process.env.SMTP_SECURE, port === 465);
@@ -40,13 +40,14 @@ const logEmailSendIssue = (context, error) => {
 
 const validateEmailConfig = ({ host, port, user, pass, from, fromConfigured, secure, requireTLS }) => {
   const issues = [];
+  const warnings = [];
 
   if (!host) issues.push('SMTP_HOST is required');
   if (!Number.isInteger(port) || port <= 0 || port > 65535) issues.push('SMTP_PORT must be a valid TCP port');
   if (!user) issues.push('SMTP_USER is required');
   if (!pass) issues.push('SMTP_PASS is required');
-  if (!from) issues.push('SMTP_FROM is required');
-  if (!fromConfigured) issues.push('SMTP_FROM is missing; falling back to SMTP_USER is not recommended for production');
+  if (!from) issues.push('SMTP_FROM or SMTP_USER is required');
+  if (!fromConfigured) warnings.push('SMTP_FROM is missing; falling back to SMTP_USER');
   if (port === 465 && !secure) issues.push('SMTP_SECURE must be true when SMTP_PORT is 465');
   if (port === 587 && secure) issues.push('SMTP_SECURE should be false when SMTP_PORT is 587 because STARTTLS is used after connection');
 
@@ -62,6 +63,18 @@ const validateEmailConfig = ({ host, port, user, pass, from, fromConfigured, sec
       requireTLS
     });
     return false;
+  }
+
+  if (warnings.length > 0) {
+    console.warn('SMTP email configuration warning:', {
+      warnings,
+      hostConfigured: Boolean(host),
+      port,
+      userConfigured: Boolean(user),
+      fromConfigured,
+      secure,
+      requireTLS
+    });
   }
 
   return true;
@@ -210,6 +223,11 @@ const sendMail = async ({ to, subject, text, html }) => {
   }
 
   try {
+    console.info(`Sending ${subject} email:`, {
+      to,
+      from
+    });
+
     const info = await transporter.sendMail({
       from,
       to,

@@ -110,7 +110,7 @@ const recordFailedLogin = async (user, req) => {
   await user.save();
 };
 
-const finishLogin = async (user, req, res) => {
+const finishLogin = async (user, req, res, extraPayload = {}) => {
   user.failedLoginAttempts = 0;
   user.lockUntil = undefined;
   user.lastLoginAt = new Date();
@@ -121,13 +121,27 @@ const finishLogin = async (user, req, res) => {
 
   const token = createSessionToken(user);
   setSessionCookie(res, token);
-  return res.json({ user: publicUser(user) });
+  return res.json({ user: publicUser(user), ...extraPayload });
 };
 
-const sendWelcomeEmailAfterRegistration = (user) => {
-  sendAccountWelcomeEmail({ name: user.name, email: user.email }).catch((error) => {
-    console.error('Account welcome email failed:', error.message);
-  });
+const sendWelcomeEmailAfterRegistration = async (user) => {
+  try {
+    const emailSent = await sendAccountWelcomeEmail({ name: user.name, email: user.email });
+    if (!emailSent) {
+      console.warn('Account welcome email was not delivered.', {
+        userId: user._id.toString(),
+        email: user.email
+      });
+    }
+    return emailSent;
+  } catch (error) {
+    console.error('Account welcome email failed:', {
+      userId: user._id.toString(),
+      email: user.email,
+      message: error.message
+    });
+    return false;
+  }
 };
 
 // Register
@@ -153,8 +167,18 @@ router.post('/register', signupLimiter, validateRegistrationPayload, async (req,
     await user.save();
 
     if (!REQUIRE_EMAIL_VERIFICATION) {
-      sendWelcomeEmailAfterRegistration(user);
-      return finishLogin(user, req, res);
+      const welcomeEmailSent = await sendWelcomeEmailAfterRegistration(user);
+      if (!welcomeEmailSent) {
+        console.warn('Registration completed, but welcome email delivery failed.', {
+          userId: user._id.toString(),
+          email: user.email
+        });
+      }
+      return finishLogin(user, req, res, {
+        email: {
+          welcomeSent: welcomeEmailSent
+        }
+      });
     }
 
     const emailSent = await sendVerificationEmail({
@@ -169,7 +193,7 @@ router.post('/register', signupLimiter, validateRegistrationPayload, async (req,
       return res.status(503).json({ message: VERIFICATION_EMAIL_UNAVAILABLE_MESSAGE });
     }
 
-    sendWelcomeEmailAfterRegistration(user);
+    await sendWelcomeEmailAfterRegistration(user);
     res.status(202).json({ message: GENERIC_SIGNUP_MESSAGE });
   } catch (error) {
     if (error.code === 11000) {
@@ -263,27 +287,38 @@ router.post('/forgot-password', resetLimiter, async (req, res) => {
     if (!email) return res.json({ message: GENERIC_RESET_MESSAGE });
 
     const user = await User.findOne({ email });
-    if (user && user.isActive) {
-      const resetToken = createRawToken();
-      user.passwordResetToken = hashToken(resetToken);
-      user.passwordResetExpires = new Date(Date.now() + RESET_TOKEN_MINUTES * 60 * 1000);
-      await user.save();
+    if (!user || !user.isActive) {
+      console.info('Password reset email request ignored for inactive or unknown account.', {
+        email,
+        userFound: Boolean(user),
+        isActive: Boolean(user?.isActive)
+      });
+      return res.json({ message: GENERIC_RESET_MESSAGE });
+    }
 
-      let emailSent = false;
-      try {
-        emailSent = await sendPasswordResetEmail({
-          name: user.name,
-          email: user.email,
-          token: resetToken,
-          clientOrigin: getRequestOrigin(req)
-        });
-      } catch (error) {
-        console.error('Password reset email failed:', error.message);
-      }
+    const resetToken = createRawToken();
+    user.passwordResetToken = hashToken(resetToken);
+    user.passwordResetExpires = new Date(Date.now() + RESET_TOKEN_MINUTES * 60 * 1000);
+    await user.save();
 
-      if (!emailSent) {
-        return res.status(503).json({ message: RESET_EMAIL_UNAVAILABLE_MESSAGE });
-      }
+    let emailSent = false;
+    try {
+      emailSent = await sendPasswordResetEmail({
+        name: user.name,
+        email: user.email,
+        token: resetToken,
+        clientOrigin: getRequestOrigin(req)
+      });
+    } catch (error) {
+      console.error('Password reset email failed:', error.message);
+    }
+
+    if (!emailSent) {
+      console.warn('Password reset email delivery failed.', {
+        userId: user._id.toString(),
+        email: user.email
+      });
+      return res.status(503).json({ message: RESET_EMAIL_UNAVAILABLE_MESSAGE });
     }
 
     res.json({ message: GENERIC_RESET_MESSAGE });
