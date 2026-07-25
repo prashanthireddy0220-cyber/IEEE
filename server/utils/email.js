@@ -10,12 +10,12 @@ const parseBooleanEnv = (value, fallback = false) => {
 
 const getEmailConfig = () => {
   const host = (process.env.SMTP_HOST || 'smtp.gmail.com').trim();
-  const port = Number(process.env.SMTP_PORT || 587);
+  const port = Number(process.env.SMTP_PORT || 465);
   const user = process.env.SMTP_USER?.trim();
   const pass = process.env.SMTP_PASS?.trim();
   const configuredFrom = (process.env.EMAIL_FROM || process.env.SMTP_FROM || '').trim();
   const from = configuredFrom || user || '';
-  const secure = parseBooleanEnv(process.env.SMTP_SECURE, false);
+  const secure = parseBooleanEnv(process.env.SMTP_SECURE, port === 465);
   const requireTLS = parseBooleanEnv(process.env.SMTP_REQUIRE_TLS, true);
 
   return { host, port, user, pass, from, emailFrom: configuredFrom, fromConfigured: Boolean(configuredFrom), secure, requireTLS };
@@ -64,9 +64,10 @@ const validateEmailConfig = ({ host, port, user, pass, from, fromConfigured, sec
   if (!pass) issues.push('SMTP_PASS is required');
   if (!from) issues.push('EMAIL_FROM or SMTP_USER is required');
   if (!fromConfigured) warnings.push('EMAIL_FROM is missing; falling back to SMTP_USER');
-  if (host === 'smtp.gmail.com' && port !== 587) issues.push('Gmail SMTP_PORT must be 587');
-  if (host === 'smtp.gmail.com' && secure) issues.push('Gmail SMTP_SECURE must be false for port 587 STARTTLS');
-  if (host === 'smtp.gmail.com' && !requireTLS) issues.push('Gmail SMTP_REQUIRE_TLS must be true');
+  if (host === 'smtp.gmail.com' && ![465, 587].includes(port)) issues.push('Gmail SMTP_PORT must be 465 or 587');
+  if (host === 'smtp.gmail.com' && port === 465 && !secure) issues.push('Gmail SMTP_SECURE must be true for port 465 SSL');
+  if (host === 'smtp.gmail.com' && port === 587 && secure) issues.push('Gmail SMTP_SECURE must be false for port 587 STARTTLS');
+  if (host === 'smtp.gmail.com' && port === 587 && !requireTLS) issues.push('Gmail SMTP_REQUIRE_TLS must be true');
   if (port === 465 && !secure) issues.push('SMTP_SECURE must be true when SMTP_PORT is 465');
   if (port === 587 && secure) issues.push('SMTP_SECURE should be false when SMTP_PORT is 587 because STARTTLS is used after connection');
 

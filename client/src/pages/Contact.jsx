@@ -37,7 +37,7 @@ export default function Contact() {
   const socialLinks = [
     { icon: FiLinkedin, label: 'LinkedIn', href: 'https://www.linkedin.com/in/ieee-education-society-kare-97b490381/', hoverClass: 'hover:bg-blue-500/20', iconClass: 'text-blue-600' },
     { icon: FiInstagram, label: 'Instagram', href: 'https://www.instagram.com/kare_ieee_eds_official/', hoverClass: 'hover:bg-purple-500/20', iconClass: 'text-purple-600' },
-    { icon: FiMail, label: 'Email', href: 'mailto:ieee-eds-sbc@college.edu', hoverClass: 'hover:bg-red-500/20', iconClass: 'text-red-600' }
+    { icon: FiMail, label: 'Email', href: 'mailto:kareieeeeducationsociety2026@gmail.com', hoverClass: 'hover:bg-red-500/20', iconClass: 'text-red-600' }
   ];
 
   return (
@@ -81,8 +81,8 @@ export default function Contact() {
                 <FiMail className="text-blue-600 text-xl" />
               </div>
               <h3 className="font-bold mb-2">Email</h3>
-              <a href="mailto:contact@ieee-sbc.edu" className="text-gray-600 dark:text-gray-400 hover:text-blue-600">
-                contact@ieee-sbc.edu
+              <a href="mailto:kareieeeeducationsociety2026@gmail.com" className="text-gray-600 dark:text-gray-400 hover:text-blue-600">
+                kareieeeeducationsociety2026@gmail.com
               </a>
             </motion.div>
 

@@ -380,7 +380,7 @@ export default function Home() {
                 <div className="mt-8 grid gap-4">
                   <div className="glassmorphism-sm rounded-[24px] p-4">
                     <div className="text-xs uppercase tracking-[0.18em] text-sky-600 dark:text-sky-300">Email</div>
-                    <div className="mt-2 text-base font-semibold">ieee-eds-sbc@college.edu</div>
+                    <div className="mt-2 text-base font-semibold">kareieeeeducationsociety2026@gmail.com</div>
                   </div>
                   <div className="glassmorphism-sm rounded-[24px] p-4">
                     <div className="text-xs uppercase tracking-[0.18em] text-cyan-600 dark:text-cyan-300">Location</div>

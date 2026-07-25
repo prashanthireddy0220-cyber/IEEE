@@ -8,7 +8,7 @@ export default function Footer() {
   const socialLinks = [
     { icon: FiLinkedin, href: 'https://www.linkedin.com/in/ieee-education-society-kare-97b490381/', label: 'LinkedIn' },
     { icon: FiInstagram, href: 'https://www.instagram.com/kare_ieee_eds_official/', label: 'Instagram' },
-    { icon: FiMail, href: 'mailto:ieeeeducation@klu.ac.in', label: 'Email' }
+    { icon: FiMail, href: 'mailto:kareieeeeducationsociety2026@gmail.com', label: 'Email' }
   ];
 
   return (
@@ -44,7 +44,7 @@ export default function Footer() {
               <div className="mt-5 grid gap-4 text-sm text-slate-600 dark:text-slate-300">
                 <div className="flex items-start gap-3">
                   <FiMail className="mt-1 text-sky-500" />
-                  <span>ieeeeducation@klu.ac.in</span>
+                  <span>kareieeeeducationsociety2026@gmail.com</span>
                 </div>
                 <div className="flex items-start gap-3">
                   <FiPhone className="mt-1 text-cyan-500" />
