@@ -16,7 +16,7 @@ const getEmailConfig = () => {
   const configuredFrom = (process.env.EMAIL_FROM || process.env.SMTP_FROM || '').trim();
   const from = configuredFrom || user || '';
   const secure = parseBooleanEnv(process.env.SMTP_SECURE, port === 465);
-  const requireTLS = parseBooleanEnv(process.env.SMTP_REQUIRE_TLS, true);
+  const requireTLS = port === 465 ? false : parseBooleanEnv(process.env.SMTP_REQUIRE_TLS, true);
 
   return { host, port, user, pass, from, emailFrom: configuredFrom, fromConfigured: Boolean(configuredFrom), secure, requireTLS };
 };
