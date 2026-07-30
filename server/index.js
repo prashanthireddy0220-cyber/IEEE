@@ -15,7 +15,7 @@ import galleryRoutes from './routes/gallery.js';
 import teamRoutes from './routes/team.js';
 import contentRoutes from './routes/content.js';
 import { seedDemoUsers } from './utils/seedDemoUsers.js';
-import { logBrevoEmailStartupStatus, verifySmtpTransporter } from './utils/email.js';
+import { logBrevoEmailStartupStatus, verifyBrevoEmailApi } from './utils/email.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -55,17 +55,17 @@ app.get('/api/health', (req, res) => {
 });
 
 app.get('/api/debug/email', async (req, res) => {
-  const result = await verifySmtpTransporter({ reset: true });
+  const result = await verifyBrevoEmailApi({ reset: true });
   if (result.success) {
     return res.json({
       success: true,
-      smtpConnected: true
+      apiConfigured: true
     });
   }
 
   return res.status(500).json({
     success: false,
-    smtpConnected: false,
+    apiConfigured: false,
     error: result.error
   });
 });

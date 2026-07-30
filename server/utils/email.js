@@ -96,7 +96,7 @@ const escapeHtml = (value) => String(value)
   .replace(/"/g, '&quot;')
   .replace(/'/g, '&#39;');
 
-export const verifySmtpTransporter = async ({ reset = false } = {}) => {
+export const verifyBrevoEmailApi = async ({ reset = false } = {}) => {
   if (reset) {
     lastEmailApiError = undefined;
   }
@@ -105,7 +105,7 @@ export const verifySmtpTransporter = async ({ reset = false } = {}) => {
   const success = validateEmailConfig(emailConfig);
   return {
     success,
-    smtpConnected: success,
+    apiConfigured: success,
     config: getSafeEmailConfigSummary(),
     error: success ? undefined : lastEmailApiError || { message: 'Brevo email API is unavailable' }
   };
