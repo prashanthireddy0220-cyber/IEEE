@@ -10,7 +10,8 @@ const parseBooleanEnv = (value, fallback = false) => {
 
 const getEmailConfig = () => {
   const host = (process.env.SMTP_HOST || 'smtp.gmail.com').trim();
-  const port = Number(process.env.SMTP_PORT || 465);
+  const configuredPort = Number(process.env.SMTP_PORT || 465);
+  const port = host === 'smtp.gmail.com' && configuredPort === 587 ? 465 : configuredPort;
   const user = process.env.SMTP_USER?.trim();
   const pass = process.env.SMTP_PASS?.trim();
   const configuredFrom = (process.env.EMAIL_FROM || process.env.SMTP_FROM || '').trim();
