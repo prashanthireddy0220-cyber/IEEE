@@ -11,7 +11,6 @@ const parseBooleanEnv = (value, fallback = false) => {
 const getEmailConfig = () => {
   const host = (process.env.SMTP_HOST || '').trim();
   const port = Number(process.env.SMTP_PORT || 587);
-  const family = Number(process.env.SMTP_FAMILY || 4);
   const user = process.env.SMTP_USER?.trim();
   const pass = process.env.SMTP_PASS?.trim();
   const configuredFrom = (process.env.EMAIL_FROM || process.env.SMTP_FROM || '').trim();
@@ -19,7 +18,7 @@ const getEmailConfig = () => {
   const secure = parseBooleanEnv(process.env.SMTP_SECURE, false);
   const requireTLS = parseBooleanEnv(process.env.SMTP_REQUIRE_TLS, true);
 
-  return { host, port, family, user, pass, from, emailFrom: configuredFrom, fromConfigured: Boolean(configuredFrom), secure, requireTLS };
+  return { host, port, user, pass, from, emailFrom: configuredFrom, fromConfigured: Boolean(configuredFrom), secure, requireTLS };
 };
 
 const getSafeErrorDetails = (error) => ({
@@ -31,12 +30,11 @@ const getSafeErrorDetails = (error) => ({
 });
 
 const getSafeEmailConfigSummary = () => {
-  const { host, port, family, user, from, emailFrom, secure, requireTLS } = getEmailConfig();
+  const { host, port, user, from, emailFrom, secure, requireTLS } = getEmailConfig();
 
   return {
     SMTP_HOST: host,
     SMTP_PORT: port,
-    SMTP_FAMILY: family,
     SMTP_USER_EXISTS: Boolean(user),
     SMTP_SECURE: secure,
     SMTP_REQUIRE_TLS: requireTLS,
@@ -56,13 +54,12 @@ const logEmailSendIssue = (context, error) => {
   console.error(`${context} email failed:`, getSafeErrorDetails(error));
 };
 
-const validateEmailConfig = ({ host, port, family, user, pass, from, fromConfigured, secure, requireTLS }) => {
+const validateEmailConfig = ({ host, port, user, pass, from, fromConfigured, secure, requireTLS }) => {
   const issues = [];
   const warnings = [];
 
   if (!host) issues.push('SMTP_HOST is required');
   if (!Number.isInteger(port) || port <= 0 || port > 65535) issues.push('SMTP_PORT must be a valid TCP port');
-  if (![4, 6].includes(family)) issues.push('SMTP_FAMILY must be 4 or 6');
   if (!user) issues.push('SMTP_USER is required');
   if (!pass) issues.push('SMTP_PASS is required');
   if (!from) issues.push('EMAIL_FROM or SMTP_USER is required');
@@ -75,7 +72,6 @@ const validateEmailConfig = ({ host, port, family, user, pass, from, fromConfigu
       issues,
       hostConfigured: Boolean(host),
       port,
-      family,
       userConfigured: Boolean(user),
       passwordConfigured: Boolean(pass),
       fromConfigured,
@@ -90,7 +86,6 @@ const validateEmailConfig = ({ host, port, family, user, pass, from, fromConfigu
       warnings,
       hostConfigured: Boolean(host),
       port,
-      family,
       userConfigured: Boolean(user),
       fromConfigured,
       secure,
@@ -114,7 +109,7 @@ const getTransporter = async () => {
 
   transporterPromise = (async () => {
     const emailConfig = getEmailConfig();
-    const { host, port, family, user, pass, secure, requireTLS } = emailConfig;
+    const { host, port, user, pass, secure, requireTLS } = emailConfig;
 
     console.info('SMTP environment loaded:', getSafeEmailConfigSummary());
 
@@ -126,30 +121,35 @@ const getTransporter = async () => {
     const { default: nodemailer } = await import('nodemailer');
 
     const transporter = nodemailer.createTransport({
-      host,
-      port,
-      family,
-      secure,
-      requireTLS,
+      host: process.env.SMTP_HOST,
+      port: Number(process.env.SMTP_PORT),
+      secure: process.env.SMTP_SECURE === 'true',
+      requireTLS: process.env.SMTP_REQUIRE_TLS === 'true',
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS
+      },
       logger: true,
       debug: true,
-      auth: {
-        user,
-        pass
-      },
-      connectionTimeout: Number(process.env.SMTP_CONNECTION_TIMEOUT_MS || 30000),
-      greetingTimeout: Number(process.env.SMTP_GREETING_TIMEOUT_MS || 10000),
-      socketTimeout: Number(process.env.SMTP_SOCKET_TIMEOUT_MS || 20000)
+      connectionTimeout: 60000,
+      greetingTimeout: 30000,
+      socketTimeout: 60000
     });
 
     console.info('Verifying SMTP transporter:', {
       host,
       port,
-      family,
       secure,
       requireTLS,
       userConfigured: Boolean(user),
       fromConfigured: emailConfig.fromConfigured
+    });
+
+    console.log({
+      host: process.env.SMTP_HOST,
+      port: process.env.SMTP_PORT,
+      secure: process.env.SMTP_SECURE,
+      requireTLS: process.env.SMTP_REQUIRE_TLS
     });
 
     await transporter.verify();
@@ -158,7 +158,6 @@ const getTransporter = async () => {
     console.info('SMTP transporter verified:', {
       host,
       port,
-      family,
       secure,
       requireTLS,
       userConfigured: Boolean(user),
