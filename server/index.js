@@ -74,22 +74,4 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
   logBrevoEmailStartupStatus();
-  verifySmtpTransporter({ reset: true })
-    .then((result) => {
-      if (result.success) {
-        console.info('Brevo email API configuration valid:', result.config);
-        return;
-      }
-
-      console.error('Brevo email API configuration failed:', {
-        config: result.config,
-        error: result.error
-      });
-    })
-    .catch((error) => {
-      console.error('Brevo email API configuration check crashed:', {
-        message: error.message,
-        code: error.code
-      });
-    });
 });
