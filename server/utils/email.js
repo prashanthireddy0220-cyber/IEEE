@@ -1,24 +1,18 @@
-let transporterPromise;
-let verifiedTransporter;
-let lastTransporterError;
+let lastEmailApiError;
 const DEFAULT_CLIENT_ORIGINS = 'http://localhost:5173,http://127.0.0.1:5173,https://ieee-jpc3.vercel.app';
-
-const parseBooleanEnv = (value, fallback = false) => {
-  if (value === undefined || value === '') return fallback;
-  return ['true', '1', 'yes', 'on'].includes(String(value).toLowerCase());
-};
+const BREVO_EMAIL_API_URL = 'https://api.brevo.com/v3/smtp/email';
+const DEFAULT_EMAIL_FROM = 'KARE IEEE Education Society <kareieeeeducationsociety2026@gmail.com>';
 
 const getEmailConfig = () => {
-  const host = (process.env.SMTP_HOST || '').trim();
-  const port = Number(process.env.SMTP_PORT || 587);
-  const user = process.env.SMTP_USER?.trim();
-  const pass = process.env.SMTP_PASS?.trim();
-  const configuredFrom = (process.env.EMAIL_FROM || process.env.SMTP_FROM || '').trim();
-  const from = configuredFrom || user || '';
-  const secure = parseBooleanEnv(process.env.SMTP_SECURE, false);
-  const requireTLS = parseBooleanEnv(process.env.SMTP_REQUIRE_TLS, true);
+  const apiKey = process.env.BREVO_API_KEY?.trim();
+  const configuredFrom = (process.env.EMAIL_FROM || DEFAULT_EMAIL_FROM).trim();
 
-  return { host, port, user, pass, from, emailFrom: configuredFrom, fromConfigured: Boolean(configuredFrom), secure, requireTLS };
+  return {
+    apiKey,
+    from: configuredFrom,
+    emailFrom: configuredFrom,
+    fromConfigured: Boolean(configuredFrom)
+  };
 };
 
 const getSafeErrorDetails = (error) => ({
@@ -30,21 +24,17 @@ const getSafeErrorDetails = (error) => ({
 });
 
 const getSafeEmailConfigSummary = () => {
-  const { host, port, user, from, emailFrom, secure, requireTLS } = getEmailConfig();
+  const { apiKey, from, emailFrom } = getEmailConfig();
 
   return {
-    SMTP_HOST: host,
-    SMTP_PORT: port,
-    SMTP_USER_EXISTS: Boolean(user),
-    SMTP_SECURE: secure,
-    SMTP_REQUIRE_TLS: requireTLS,
+    BREVO_API_KEY_EXISTS: Boolean(apiKey),
     EMAIL_FROM: emailFrom || from,
     CLIENT_URL: getConfiguredClientUrl()
   };
 };
 
 const logEmailConfigIssue = (message, details = {}) => {
-  console.error('SMTP email configuration error:', {
+  console.error('Brevo email configuration error:', {
     message,
     ...details
   });
@@ -54,47 +44,50 @@ const logEmailSendIssue = (context, error) => {
   console.error(`${context} email failed:`, getSafeErrorDetails(error));
 };
 
-const validateEmailConfig = ({ host, port, user, pass, from, fromConfigured, secure, requireTLS }) => {
+const validateEmailConfig = ({ apiKey, from, fromConfigured }) => {
   const issues = [];
-  const warnings = [];
 
-  if (!host) issues.push('SMTP_HOST is required');
-  if (!Number.isInteger(port) || port <= 0 || port > 65535) issues.push('SMTP_PORT must be a valid TCP port');
-  if (!user) issues.push('SMTP_USER is required');
-  if (!pass) issues.push('SMTP_PASS is required');
-  if (!from) issues.push('EMAIL_FROM or SMTP_USER is required');
-  if (!fromConfigured) warnings.push('EMAIL_FROM is missing; falling back to SMTP_USER');
-  if (port === 465 && !secure) issues.push('SMTP_SECURE must be true when SMTP_PORT is 465');
-  if (port === 587 && secure) issues.push('SMTP_SECURE should be false when SMTP_PORT is 587 because STARTTLS is used after connection');
+  if (!apiKey) issues.push('BREVO_API_KEY is required');
+  if (!from) issues.push('EMAIL_FROM is required');
 
   if (issues.length > 0) {
-    logEmailConfigIssue('Invalid SMTP configuration.', {
+    logEmailConfigIssue('Invalid Brevo API configuration.', {
       issues,
-      hostConfigured: Boolean(host),
-      port,
-      userConfigured: Boolean(user),
-      passwordConfigured: Boolean(pass),
-      fromConfigured,
-      secure,
-      requireTLS
+      apiKeyConfigured: Boolean(apiKey),
+      fromConfigured
     });
     return false;
   }
 
-  if (warnings.length > 0) {
-    console.warn('SMTP email configuration warning:', {
-      warnings,
-      hostConfigured: Boolean(host),
-      port,
-      userConfigured: Boolean(user),
-      fromConfigured,
-      secure,
-      requireTLS
-    });
-  }
-
   return true;
 };
+
+const parseSender = (from) => {
+  const match = from.match(/^\s*(.*?)\s*<([^>]+)>\s*$/);
+  if (!match) return { email: from };
+
+  const name = match[1].replace(/^"|"$/g, '').trim();
+  const email = match[2].trim();
+  return name ? { name, email } : { email };
+};
+
+const createBrevoEmailClient = (apiKey) => ({
+  sendEmail: ({ sender, to, subject, textContent, htmlContent }) => fetch(BREVO_EMAIL_API_URL, {
+    method: 'POST',
+    headers: {
+      accept: 'application/json',
+      'api-key': apiKey,
+      'content-type': 'application/json'
+    },
+    body: JSON.stringify({
+      sender,
+      to,
+      subject,
+      textContent,
+      htmlContent
+    })
+  })
+});
 
 const escapeHtml = (value) => String(value)
   .replace(/&/g, '&amp;')
@@ -103,74 +96,23 @@ const escapeHtml = (value) => String(value)
   .replace(/"/g, '&quot;')
   .replace(/'/g, '&#39;');
 
-const getTransporter = async () => {
-  if (verifiedTransporter) return verifiedTransporter;
-  if (transporterPromise) return transporterPromise;
-
-  transporterPromise = (async () => {
-    const emailConfig = getEmailConfig();
-    const { host, port, user, pass, secure, requireTLS } = emailConfig;
-
-    console.info('SMTP environment loaded:', getSafeEmailConfigSummary());
-
-    if (!validateEmailConfig(emailConfig)) {
-      transporterPromise = undefined;
-      return null;
-    }
-
-    const { default: nodemailer } = await import('nodemailer');
-
-    const transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST,
-      port: Number(process.env.SMTP_PORT),
-      secure: false,
-      requireTLS: true,
-      auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS
-      },
-      connectionTimeout: 10000,
-      greetingTimeout: 10000,
-      socketTimeout: 10000
-    });
-
-    verifiedTransporter = transporter;
-    lastTransporterError = undefined;
-    console.info('SMTP transporter configured:', {
-      host,
-      port,
-      secure,
-      requireTLS,
-      userConfigured: Boolean(user),
-      fromConfigured: emailConfig.fromConfigured
-    });
-
-    return verifiedTransporter;
-  })().catch((error) => {
-    lastTransporterError = getSafeErrorDetails(error);
-    logEmailConfigIssue('Transporter setup or verification failed.', lastTransporterError);
-    transporterPromise = undefined;
-    verifiedTransporter = undefined;
-    return null;
-  });
-
-  return transporterPromise;
-};
-
 export const verifySmtpTransporter = async ({ reset = false } = {}) => {
   if (reset) {
-    transporterPromise = undefined;
-    verifiedTransporter = undefined;
-    lastTransporterError = undefined;
+    lastEmailApiError = undefined;
   }
 
-  const transporter = await getTransporter();
+  const emailConfig = getEmailConfig();
+  const success = validateEmailConfig(emailConfig);
   return {
-    success: Boolean(transporter),
-    smtpConnected: Boolean(transporter),
+    success,
+    smtpConnected: success,
     config: getSafeEmailConfigSummary(),
-    error: transporter ? undefined : lastTransporterError || { message: 'SMTP transporter is unavailable' }
+    error: success ? undefined : lastEmailApiError || { message: 'Brevo email API is unavailable' }
   };
+};
+
+export const logBrevoEmailStartupStatus = () => {
+  console.info('Brevo email startup configuration:', getSafeEmailConfigSummary());
 };
 
 const buildAccountWelcomeEmail = ({ name }) => {
@@ -240,14 +182,14 @@ const getClientUrl = (requestOrigin) => {
 };
 
 const sendMail = async ({ to, subject, text, html }) => {
-  const transporter = await getTransporter();
-  const { from } = getEmailConfig();
+  const emailConfig = getEmailConfig();
+  const { apiKey, from } = emailConfig;
 
-  if (!transporter) {
-    console.warn(`${subject} email skipped: SMTP transporter is unavailable.`, {
+  if (!validateEmailConfig(emailConfig)) {
+    console.warn(`${subject} email skipped: Brevo email API is not configured.`, {
       to,
       from,
-      error: lastTransporterError
+      error: lastEmailApiError
     });
     return false;
   }
@@ -258,22 +200,41 @@ const sendMail = async ({ to, subject, text, html }) => {
       from
     });
 
-    const info = await transporter.sendMail({
-      from,
-      to,
+    const brevoEmailClient = createBrevoEmailClient(apiKey);
+    const response = await brevoEmailClient.sendEmail({
+      sender: parseSender(from),
+      to: [{ email: to }],
       subject,
-      text,
-      html
+      textContent: text,
+      htmlContent: html
     });
 
+    if (!response.ok) {
+      const errorBody = await response.text();
+      lastEmailApiError = {
+        message: 'Brevo email API request failed',
+        status: response.status,
+        statusText: response.statusText,
+        response: errorBody
+      };
+      console.error(`${subject} email failed:`, {
+        to,
+        status: response.status,
+        statusText: response.statusText,
+        response: errorBody
+      });
+      return false;
+    }
+
+    const result = await response.json().catch(() => ({}));
+    lastEmailApiError = undefined;
     console.info(`${subject} email sent:`, {
       to,
-      messageId: info.messageId,
-      accepted: info.accepted,
-      rejected: info.rejected
+      messageId: result.messageId
     });
     return true;
   } catch (error) {
+    lastEmailApiError = getSafeErrorDetails(error);
     logEmailSendIssue(subject, error);
     return false;
   }

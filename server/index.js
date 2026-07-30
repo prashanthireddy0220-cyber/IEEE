@@ -15,7 +15,7 @@ import galleryRoutes from './routes/gallery.js';
 import teamRoutes from './routes/team.js';
 import contentRoutes from './routes/content.js';
 import { seedDemoUsers } from './utils/seedDemoUsers.js';
-import { verifySmtpTransporter } from './utils/email.js';
+import { logBrevoEmailStartupStatus, verifySmtpTransporter } from './utils/email.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -73,20 +73,21 @@ app.get('/api/debug/email', async (req, res) => {
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
+  logBrevoEmailStartupStatus();
   verifySmtpTransporter({ reset: true })
     .then((result) => {
       if (result.success) {
-        console.info('SMTP startup verification successful:', result.config);
+        console.info('Brevo email API configuration valid:', result.config);
         return;
       }
 
-      console.error('SMTP startup verification failed:', {
+      console.error('Brevo email API configuration failed:', {
         config: result.config,
         error: result.error
       });
     })
     .catch((error) => {
-      console.error('SMTP startup verification crashed:', {
+      console.error('Brevo email API configuration check crashed:', {
         message: error.message,
         code: error.code
       });
