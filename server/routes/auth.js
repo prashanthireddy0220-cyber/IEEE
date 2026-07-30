@@ -201,11 +201,13 @@ router.post('/register', signupLimiter, validateRegistrationPayload, async (req,
       }
     });
   } catch (error) {
-    if (error.code === 11000) {
-      return res.status(409).json({ message: ACCOUNT_EXISTS_MESSAGE });
-    }
-    console.error('Registration failed:', error.message);
-    res.status(500).json({ message: 'Unable to process request' });
+    console.error("========== REGISTER ERROR ==========");
+    console.error(error);
+    console.error(error.stack);
+
+    res.status(500).json({
+      message: error.message
+    });
   }
 });
 

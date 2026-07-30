@@ -23,16 +23,8 @@ const __dirname = path.dirname(__filename);
 const app = express();
 
 // Middleware
-const allowedOrigins = (process.env.CLIENT_ORIGIN || 'http://localhost:5173,http://127.0.0.1:5173,https://ieee-jpc3.vercel.app')
-  .split(',')
-  .map((origin) => origin.trim())
-  .filter(Boolean);
-
 app.use(cors({
-  origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
-    return callback(new Error('Not allowed by CORS'));
-  },
+  origin: true,
   credentials: true
 }));
 app.use(express.json({ limit: '1mb' }));
