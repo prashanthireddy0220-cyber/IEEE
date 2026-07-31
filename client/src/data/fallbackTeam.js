@@ -448,6 +448,19 @@ export const fallbackTeamMembers = [
       instagram: ''
     },
     bio: 'Supporting partnerships, sponsor communication, and resource coordination for chapter initiatives.'
+  },
+  {
+    _id: 'fallback-core-aiml-team-lead',
+    name: 'Surya Prakash',
+    role: 'core-team',
+    department: 'AIML Team Lead',
+    phone: '',
+    photo: '',
+    socialMedia: {
+      linkedin: '',
+      instagram: ''
+    },
+    bio: 'Leading AIML initiatives, applied learning, and technical exploration within the chapter.'
   }
 ];
 
