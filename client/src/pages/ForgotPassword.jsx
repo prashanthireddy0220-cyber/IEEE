@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FiArrowRight, FiMail } from 'react-icons/fi';
 import { sendPasswordResetEmail } from 'firebase/auth';
-import { auth } from '../firebase';
+import { auth, firebaseConfigMissingMessage } from '../firebase';
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState('');
@@ -17,6 +17,11 @@ export default function ForgotPassword() {
     setError('');
 
     try {
+      if (!auth) {
+        setError(firebaseConfigMissingMessage);
+        return;
+      }
+
       await sendPasswordResetEmail(auth, email.trim().toLowerCase());
       setMessage('If the email is registered, password reset instructions will be sent.');
     } catch (error) {

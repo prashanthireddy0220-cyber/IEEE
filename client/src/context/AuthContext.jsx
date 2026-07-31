@@ -8,7 +8,7 @@ import {
   signOut,
   updateProfile
 } from 'firebase/auth';
-import { auth } from '../firebase';
+import { auth, firebaseConfigMissingMessage } from '../firebase';
 
 const AuthContext = createContext();
 const apiBaseUrl = (
@@ -51,6 +51,8 @@ const syncMongoProfile = async (firebaseUser, name) => {
 };
 
 axios.interceptors.request.use(async (config) => {
+  if (!auth) return config;
+
   const firebaseUser = auth.currentUser;
   if (firebaseUser) {
     const idToken = await firebaseUser.getIdToken();
@@ -65,6 +67,12 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!auth) {
+      setUser(null);
+      setLoading(false);
+      return undefined;
+    }
+
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (!firebaseUser) {
         setUser(null);
@@ -96,6 +104,8 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = async (email, password) => {
+    if (!auth) throw firebaseConfigMissingMessage;
+
     try {
       const credential = await signInWithEmailAndPassword(auth, email.trim().toLowerCase(), password);
       await credential.user.reload();
@@ -116,6 +126,8 @@ export const AuthProvider = ({ children }) => {
   };
 
   const register = async (name, email, password) => {
+    if (!auth) throw firebaseConfigMissingMessage;
+
     try {
       const credential = await createUserWithEmailAndPassword(auth, email.trim().toLowerCase(), password);
       await updateProfile(credential.user, { displayName: name.trim() });
@@ -136,7 +148,7 @@ export const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     axios.post('/api/auth/logout').catch(() => {});
-    await signOut(auth);
+    if (auth) await signOut(auth);
     setUser(null);
     delete axios.defaults.headers.common.Authorization;
   };

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { applyActionCode } from 'firebase/auth';
-import { auth } from '../firebase';
+import { auth, firebaseConfigMissingMessage } from '../firebase';
 
 export default function VerifyEmail() {
   const [searchParams] = useSearchParams();
@@ -11,6 +11,11 @@ export default function VerifyEmail() {
   useEffect(() => {
     const verify = async () => {
       try {
+        if (!auth) {
+          setMessage(firebaseConfigMissingMessage);
+          return;
+        }
+
         if (!oobCode) {
           setMessage('This verification link is missing or invalid.');
           return;

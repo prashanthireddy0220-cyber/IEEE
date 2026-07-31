@@ -10,7 +10,9 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_FIREBASE_APP_ID
 };
 
-const app = initializeApp(firebaseConfig);
+const isFirebaseConfigured = Object.values(firebaseConfig).every(Boolean);
+const app = isFirebaseConfigured ? initializeApp(firebaseConfig) : null;
 
-export const auth = getAuth(app);
+export const auth = app ? getAuth(app) : null;
+export const firebaseConfigMissingMessage = 'Firebase is not configured. Fill in the VITE_FIREBASE_* values in client/.env and restart the dev server.';
 export default app;

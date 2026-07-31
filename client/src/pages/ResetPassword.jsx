@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { FiArrowRight, FiLock } from 'react-icons/fi';
 import { confirmPasswordReset } from 'firebase/auth';
-import { auth } from '../firebase';
+import { auth, firebaseConfigMissingMessage } from '../firebase';
 
 export default function ResetPassword() {
   const passwordHelp = 'Use at least 8 characters and include one special character.';
@@ -37,6 +37,11 @@ export default function ResetPassword() {
 
     setLoading(true);
     try {
+      if (!auth) {
+        setError(firebaseConfigMissingMessage);
+        return;
+      }
+
       await confirmPasswordReset(auth, oobCode, password);
       setMessage('Password has been reset.');
       setPassword('');

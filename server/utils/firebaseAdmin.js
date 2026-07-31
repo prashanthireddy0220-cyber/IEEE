@@ -1,5 +1,6 @@
 import fs from 'fs';
-import admin from 'firebase-admin';
+import { cert, getApp, getApps, initializeApp } from 'firebase-admin/app';
+import { getAuth } from 'firebase-admin/auth';
 
 const RENDER_FIREBASE_SERVICE_ACCOUNT_FILE = '/etc/secrets/firebase-service-account.json';
 
@@ -24,10 +25,10 @@ const getServiceAccount = () => {
 };
 
 export const initializeFirebaseAdmin = () => {
-  if (admin.apps.length) return admin.app();
+  if (getApps().length) return getApp();
 
-  return admin.initializeApp({
-    credential: admin.credential.cert(getServiceAccount())
+  return initializeApp({
+    credential: cert(getServiceAccount())
   });
 };
 
@@ -35,5 +36,5 @@ export const getFirebaseAdmin = () => initializeFirebaseAdmin();
 
 export const verifyFirebaseIdToken = async (idToken) => {
   const firebase = getFirebaseAdmin();
-  return firebase.auth().verifyIdToken(idToken);
+  return getAuth(firebase).verifyIdToken(idToken);
 };
