@@ -26,7 +26,7 @@ export default function Login() {
       await login(email, password);
       navigate('/dashboard');
     } catch (err) {
-      setError(err);
+      setError(typeof err === 'string' ? err : err?.message || 'Invalid credentials');
     } finally {
       setLoading(false);
     }

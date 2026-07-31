@@ -111,9 +111,8 @@ export const AuthProvider = ({ children }) => {
       await credential.user.reload();
 
       if (!credential.user.emailVerified) {
-        await sendEmailVerification(credential.user);
         await signOut(auth);
-        throw 'Please verify your email before logging in. A new verification email has been sent.';
+        throw new Error('Please verify your email before logging in.');
       }
 
       const userData = await syncMongoProfile(credential.user, credential.user.displayName);
@@ -129,14 +128,14 @@ export const AuthProvider = ({ children }) => {
     if (!auth) throw firebaseConfigMissingMessage;
 
     try {
-      const credential = await createUserWithEmailAndPassword(auth, email.trim().toLowerCase(), password);
-      await updateProfile(credential.user, { displayName: name.trim() });
-      await sendEmailVerification(credential.user);
-      await syncMongoProfile(credential.user, name.trim());
+      const userCredential = await createUserWithEmailAndPassword(auth, email.trim().toLowerCase(), password);
+      await updateProfile(userCredential.user, { displayName: name.trim() });
+      await sendEmailVerification(userCredential.user);
+      await syncMongoProfile(userCredential.user, name.trim());
       await signOut(auth);
 
       return {
-        message: 'Account created. Check your inbox and verify your email before logging in.'
+        message: 'Account created successfully.\nPlease check your email (including Spam folder) and verify your email before logging in.'
       };
     } catch (error) {
       if (error.response) {
