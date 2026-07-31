@@ -1,10 +1,9 @@
 import mongoose from 'mongoose';
-import bcrypt from 'bcryptjs';
 
 const userSchema = new mongoose.Schema({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true, lowercase: true, trim: true },
-  password: { type: String, required: true },
+  firebaseUid: { type: String, unique: true, sparse: true },
   role: { 
     type: String, 
     enum: ['chairman', 'faculty', 'core-team', 'student-chairperson', 'student'],
@@ -21,11 +20,7 @@ const userSchema = new mongoose.Schema({
     twitter: String,
     github: String
   },
-  emailVerified: { type: Boolean, default: true },
-  emailVerificationToken: String,
-  emailVerificationExpires: Date,
-  passwordResetToken: String,
-  passwordResetExpires: Date,
+  emailVerified: { type: Boolean, default: false },
   failedLoginAttempts: { type: Number, default: 0 },
   lockUntil: Date,
   lastLoginAt: Date,
@@ -38,26 +33,7 @@ const userSchema = new mongoose.Schema({
 });
 
 userSchema.index({ email: 1 }, { unique: true });
-userSchema.index({ passwordResetToken: 1 }, { sparse: true });
-userSchema.index({ emailVerificationToken: 1 }, { sparse: true });
-
-// Hash password before saving
-userSchema.pre('save', async function(next) {
-  if (!this.isModified('password')) return next();
-  
-  try {
-    const salt = await bcrypt.genSalt(10);
-    this.password = await bcrypt.hash(this.password, salt);
-    next();
-  } catch (error) {
-    next(error);
-  }
-});
-
-// Method to compare passwords
-userSchema.methods.comparePassword = async function(enteredPassword) {
-  return await bcrypt.compare(enteredPassword, this.password);
-};
+userSchema.index({ firebaseUid: 1 }, { unique: true, sparse: true });
 
 userSchema.methods.isLocked = function() {
   return Boolean(this.lockUntil && this.lockUntil > Date.now());

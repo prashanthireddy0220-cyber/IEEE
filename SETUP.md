@@ -30,7 +30,8 @@ cp .env.example .env
 
 # Edit .env with your settings
 # MONGODB_URI=mongodb://localhost:27017/ieee-sbc
-# JWT_SECRET=your_secret_key_here
+# FIREBASE_SERVICE_ACCOUNT={"type":"service_account",...}
+# Or add /etc/secrets/firebase-service-account.json as a Render Secret File
 # PORT=5000
 ```
 
@@ -181,7 +182,7 @@ PORT=5001
 ## Deployment Checklist
 
 - [ ] Update environment variables for production
-- [ ] Set JWT_SECRET to a strong random value
+- [ ] Configure Firebase Admin credentials
 - [ ] Use MongoDB Atlas for production database
 - [ ] Set NODE_ENV=production
 - [ ] Build frontend: `npm run client:build`

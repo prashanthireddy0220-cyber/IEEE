@@ -1,59 +1,24 @@
 import express from 'express';
 import User from '../models/User.js';
-import {
-  sendAccountWelcomeEmail,
-  sendPasswordResetEmail,
-  sendVerificationEmail
-} from '../utils/email.js';
-import {
-  clearSessionCookie,
-  createRawToken,
-  createSessionToken,
-  hashToken,
-  setSessionCookie
-} from '../utils/authTokens.js';
-import {
-  createRateLimiter,
-  isStrongPassword,
-  validateAuthPayload,
-  validateRegistrationPayload
-} from '../middleware/security.js';
 import { authenticateToken } from '../middleware/auth.js';
+import { createRateLimiter } from '../middleware/security.js';
+import { verifyFirebaseIdToken } from '../utils/firebaseAdmin.js';
 
 const router = express.Router();
-const GENERIC_LOGIN_ERROR = 'Invalid credentials';
-const GENERIC_SIGNUP_MESSAGE = 'Request received. If this account already exists, use Login to continue.';
-const GENERIC_RESET_MESSAGE = 'If the email is registered, password reset instructions will be sent.';
-const ACCOUNT_EXISTS_MESSAGE = 'An account already exists for this email. Please login or use Forgot password.';
-const LOCK_ATTEMPTS = Number(process.env.LOGIN_LOCK_ATTEMPTS || 5);
-const LOCK_MINUTES = Number(process.env.LOGIN_LOCK_MINUTES || 15);
-const VERIFY_TOKEN_MINUTES = Number(process.env.VERIFY_TOKEN_MINUTES || 60);
-const RESET_TOKEN_MINUTES = Number(process.env.RESET_TOKEN_MINUTES || 15);
-const REQUIRE_EMAIL_VERIFICATION = process.env.REQUIRE_EMAIL_VERIFICATION === 'true';
 
-const loginLimiter = createRateLimiter({
+const sessionLimiter = createRateLimiter({
   windowMs: 15 * 60 * 1000,
-  max: Number(process.env.LOGIN_RATE_LIMIT_MAX || 20),
-  message: 'Too many attempts. Please try again later.'
-});
-
-const signupLimiter = createRateLimiter({
-  windowMs: 60 * 60 * 1000,
-  max: Number(process.env.SIGNUP_RATE_LIMIT_MAX || 10),
-  message: 'Too many requests. Please try again later.'
-});
-
-const resetLimiter = createRateLimiter({
-  windowMs: 60 * 60 * 1000,
-  max: Number(process.env.RESET_RATE_LIMIT_MAX || 8),
+  max: Number(process.env.AUTH_SESSION_RATE_LIMIT_MAX || 60),
   message: 'Too many requests. Please try again later.'
 });
 
 const publicUser = (user) => ({
   id: user._id,
+  firebaseUid: user.firebaseUid,
   name: user.name,
   email: user.email,
-  role: user.role
+  role: user.role,
+  emailVerified: user.emailVerified
 });
 
 const getClientIp = (req) => {
@@ -62,199 +27,60 @@ const getClientIp = (req) => {
   return (ip || req.ip || req.socket?.remoteAddress || '').trim();
 };
 
-const getRequestOrigin = (req) => req.headers.origin || '';
-
-const verifyCaptchaIfRequired = async (req, user) => {
-  const captchaSecret = process.env.CAPTCHA_SECRET;
-  const shouldRequireCaptcha = Boolean(captchaSecret && user && user.failedLoginAttempts >= 3);
-
-  if (!shouldRequireCaptcha) return true;
-
-  const captchaToken = req.body?.captchaToken;
-  if (!captchaToken) return false;
-
-  try {
-    const response = await fetch('https://www.google.com/recaptcha/api/siteverify', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({
-        secret: captchaSecret,
-        response: captchaToken,
-        remoteip: getClientIp(req)
-      })
-    });
-    const result = await response.json();
-    return Boolean(result.success);
-  } catch (error) {
-    console.error('CAPTCHA verification failed:', error.message);
-    return false;
-  }
+const getBearerToken = (req) => {
+  const authHeader = req.headers.authorization || '';
+  return authHeader.startsWith('Bearer ') ? authHeader.slice(7) : '';
 };
 
-const recordFailedLogin = async (user, req) => {
-  if (!user) {
-    console.warn('Failed login for unknown account', { ip: getClientIp(req), email: req.body?.email });
-    return;
-  }
-
-  user.failedLoginAttempts = (user.failedLoginAttempts || 0) + 1;
-  if (user.failedLoginAttempts >= LOCK_ATTEMPTS) {
-    user.lockUntil = new Date(Date.now() + LOCK_MINUTES * 60 * 1000);
-    console.warn('Account temporarily locked after failed logins', {
-      userId: user._id.toString(),
-      ip: getClientIp(req)
-    });
-  }
-  await user.save();
-};
-
-const finishLogin = async (user, req, res, extraPayload = {}) => {
-  user.failedLoginAttempts = 0;
-  user.lockUntil = undefined;
-  user.lastLoginAt = new Date();
-  user.lastLoginIp = getClientIp(req);
-  user.lastLoginUserAgent = req.headers['user-agent'] || '';
-  user.tokenVersion = (user.tokenVersion || 0) + 1;
-  await user.save();
-
-  const token = createSessionToken(user);
-  setSessionCookie(res, token);
-  return res.json({ user: publicUser(user), ...extraPayload });
-};
-
-const sendWelcomeEmailAfterRegistration = async (user) => {
+router.post('/session', sessionLimiter, async (req, res) => {
   try {
-    const emailSent = await sendAccountWelcomeEmail({ name: user.name, email: user.email });
-    if (!emailSent) {
-      console.warn('Account welcome email was not delivered.', {
-        userId: user._id.toString(),
-        email: user.email
-      });
-    }
-    return emailSent;
-  } catch (error) {
-    console.error('Account welcome email failed:', {
-      userId: user._id.toString(),
-      email: user.email,
-      message: error.message
-    });
-    return false;
-  }
-};
+    const token = getBearerToken(req);
+    if (!token) return res.status(401).json({ message: 'Authentication required' });
 
-// Register
-router.post('/register', signupLimiter, validateRegistrationPayload, async (req, res) => {
-  try {
-    const { name, email, password } = req.body;
+    const decoded = await verifyFirebaseIdToken(token);
+    const email = decoded.email?.trim().toLowerCase();
+    const name = (req.body?.name || decoded.name || email?.split('@')[0] || 'IEEE Member').trim();
 
-    const userExists = await User.findOne({ email });
-    if (userExists) {
-      return res.status(409).json({ message: ACCOUNT_EXISTS_MESSAGE });
-    }
+    if (!email) return res.status(400).json({ message: 'Firebase account email is required' });
 
-    const verificationToken = REQUIRE_EMAIL_VERIFICATION ? createRawToken() : '';
-    const user = new User({
-      name,
-      email,
-      password,
-      role: 'student',
-      emailVerified: !REQUIRE_EMAIL_VERIFICATION,
-      emailVerificationToken: REQUIRE_EMAIL_VERIFICATION ? hashToken(verificationToken) : undefined,
-      emailVerificationExpires: REQUIRE_EMAIL_VERIFICATION ? new Date(Date.now() + VERIFY_TOKEN_MINUTES * 60 * 1000) : undefined
-    });
-    await user.save();
-
-    const welcomeEmailSent = await sendWelcomeEmailAfterRegistration(user);
-    if (!welcomeEmailSent) {
-      console.warn('Registration completed, but welcome email delivery failed.', {
-        userId: user._id.toString(),
-        email: user.email
-      });
-    }
-
-    if (!REQUIRE_EMAIL_VERIFICATION) {
-      return finishLogin(user, req, res, {
-        email: {
-          welcomeSent: welcomeEmailSent
-        }
-      });
-    }
-
-    const emailSent = await sendVerificationEmail({
-      name: user.name,
-      email: user.email,
-      token: verificationToken,
-      clientOrigin: getRequestOrigin(req)
-    });
-    if (!emailSent) {
-      console.warn('Email verification delivery failed after account creation.', {
-        userId: user._id.toString(),
-        email: user.email
-      });
-    }
-
-    res.status(202).json({
-      message: GENERIC_SIGNUP_MESSAGE,
-      email: {
-        welcomeSent: welcomeEmailSent,
-        verificationSent: emailSent
-      }
-    });
-  } catch (error) {
-    console.error("========== REGISTER ERROR ==========");
-    console.error(error);
-    console.error(error.stack);
-
-    res.status(500).json({
-      message: error.message
-    });
-  }
-});
-
-// Login
-router.post('/login', loginLimiter, validateAuthPayload, async (req, res) => {
-  try {
-    const { email, password } = req.body;
-
-    const user = await User.findOne({ email }).select('+password');
-    if (!user || !user.isActive || user.isLocked()) {
-      await recordFailedLogin(user, req);
-      return res.status(401).json({ message: GENERIC_LOGIN_ERROR });
-    }
-
-    const captchaOk = await verifyCaptchaIfRequired(req, user);
-    if (!captchaOk) {
-      await recordFailedLogin(user, req);
-      return res.status(401).json({ message: GENERIC_LOGIN_ERROR });
-    }
-
-    const isPasswordValid = await user.comparePassword(password);
-    if (!isPasswordValid) {
-      await recordFailedLogin(user, req);
-      return res.status(401).json({ message: GENERIC_LOGIN_ERROR });
-    }
-
-    if (user.emailVerified === false && !REQUIRE_EMAIL_VERIFICATION) {
-      user.emailVerified = true;
-      user.emailVerificationToken = undefined;
-      user.emailVerificationExpires = undefined;
+    let user = await User.findOne({ $or: [{ firebaseUid: decoded.uid }, { email }] });
+    if (user) {
+      user.firebaseUid = decoded.uid;
+      user.email = email;
+      user.emailVerified = Boolean(decoded.email_verified);
+      user.lastLoginAt = new Date();
+      user.lastLoginIp = getClientIp(req);
+      user.lastLoginUserAgent = req.headers['user-agent'] || '';
+      if (!user.name && name) user.name = name;
       await user.save();
+    } else {
+      user = await User.create({
+        firebaseUid: decoded.uid,
+        name,
+        email,
+        role: 'student',
+        emailVerified: Boolean(decoded.email_verified),
+        isActive: true,
+        lastLoginAt: new Date(),
+        lastLoginIp: getClientIp(req),
+        lastLoginUserAgent: req.headers['user-agent'] || ''
+      });
     }
 
-    if (user.emailVerified === false) {
-      return res.status(401).json({ message: GENERIC_LOGIN_ERROR });
+    if (!user.isActive) {
+      return res.status(401).json({ message: 'Authentication required' });
     }
 
-    await finishLogin(user, req, res);
+    res.json({ user: publicUser(user) });
   } catch (error) {
-    console.error('Login failed:', error.message);
-    res.status(500).json({ message: 'Unable to process request' });
+    console.error('Firebase session failed:', error.message);
+    res.status(401).json({ message: 'Authentication required' });
   }
 });
 
 router.get('/me', authenticateToken, async (req, res) => {
   try {
-    const user = await User.findById(req.user.id).select('-password');
+    const user = await User.findById(req.user.id).select('-__v');
     if (!user) return res.status(401).json({ message: 'Authentication required' });
 
     res.json({ user: publicUser(user) });
@@ -264,118 +90,7 @@ router.get('/me', authenticateToken, async (req, res) => {
   }
 });
 
-router.post('/verify-email', async (req, res) => {
-  try {
-    const token = typeof req.body?.token === 'string' ? req.body.token : '';
-    if (!token) return res.status(400).json({ message: 'Invalid request' });
-
-    const user = await User.findOne({
-      emailVerificationToken: hashToken(token),
-      emailVerificationExpires: { $gt: new Date() }
-    });
-
-    if (user) {
-      user.emailVerified = true;
-      user.emailVerificationToken = undefined;
-      user.emailVerificationExpires = undefined;
-      await user.save();
-    }
-
-    res.json({ message: 'If the verification link is valid, the account has been verified.' });
-  } catch (error) {
-    console.error('Email verification failed:', error.message);
-    res.status(500).json({ message: 'Unable to process request' });
-  }
-});
-
-router.post('/forgot-password', resetLimiter, async (req, res) => {
-  try {
-    const email = typeof req.body?.email === 'string' ? req.body.email.trim().toLowerCase() : '';
-    if (!email) return res.json({ message: GENERIC_RESET_MESSAGE });
-
-    const user = await User.findOne({ email });
-    if (!user || !user.isActive) {
-      console.info('Password reset email request ignored for inactive or unknown account.', {
-        email,
-        userFound: Boolean(user),
-        isActive: Boolean(user?.isActive)
-      });
-      return res.json({ message: GENERIC_RESET_MESSAGE });
-    }
-
-    const resetToken = createRawToken();
-    user.passwordResetToken = hashToken(resetToken);
-    user.passwordResetExpires = new Date(Date.now() + RESET_TOKEN_MINUTES * 60 * 1000);
-    await user.save();
-
-    let emailSent = false;
-    try {
-      emailSent = await sendPasswordResetEmail({
-        name: user.name,
-        email: user.email,
-        token: resetToken,
-        clientOrigin: getRequestOrigin(req)
-      });
-    } catch (error) {
-      console.error('Password reset email failed:', error.message);
-    }
-
-    if (!emailSent) {
-      console.warn('Password reset email delivery failed.', {
-        userId: user._id.toString(),
-        email: user.email
-      });
-    }
-
-    res.json({
-      message: GENERIC_RESET_MESSAGE,
-      email: {
-        resetSent: emailSent
-      }
-    });
-  } catch (error) {
-    console.error('Forgot password failed:', error.message);
-    res.status(500).json({ message: 'Unable to process request' });
-  }
-});
-
-router.post('/reset-password', async (req, res) => {
-  try {
-    const token = typeof req.body?.token === 'string' ? req.body.token : '';
-    const password = typeof req.body?.password === 'string' ? req.body.password : '';
-
-    if (!token || !isStrongPassword(password)) {
-      return res.status(400).json({ message: 'Invalid request' });
-    }
-
-    const user = await User.findOne({
-      passwordResetToken: hashToken(token),
-      passwordResetExpires: { $gt: new Date() }
-    });
-
-    if (!user) {
-      return res.status(400).json({ message: 'Invalid request' });
-    }
-
-    user.password = password;
-    user.passwordResetToken = undefined;
-    user.passwordResetExpires = undefined;
-    user.failedLoginAttempts = 0;
-    user.lockUntil = undefined;
-    user.tokenVersion = (user.tokenVersion || 0) + 1;
-    await user.save();
-
-    clearSessionCookie(res);
-    res.json({ message: 'Password has been reset.' });
-  } catch (error) {
-    console.error('Password reset failed:', error.message);
-    res.status(500).json({ message: 'Unable to process request' });
-  }
-});
-
-// Logout
 router.post('/logout', (req, res) => {
-  clearSessionCookie(res);
   res.json({ message: 'Logged out successfully' });
 });
 

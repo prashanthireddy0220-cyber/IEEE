@@ -15,12 +15,13 @@ import galleryRoutes from './routes/gallery.js';
 import teamRoutes from './routes/team.js';
 import contentRoutes from './routes/content.js';
 import { seedDemoUsers } from './utils/seedDemoUsers.js';
-import { logBrevoEmailStartupStatus, verifyBrevoEmailApi } from './utils/email.js';
+import { initializeFirebaseAdmin } from './utils/firebaseAdmin.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
+initializeFirebaseAdmin();
 
 // Middleware
 app.use(cors({
@@ -54,24 +55,7 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'Server is running' });
 });
 
-app.get('/api/debug/email', async (req, res) => {
-  const result = await verifyBrevoEmailApi({ reset: true });
-  if (result.success) {
-    return res.json({
-      success: true,
-      apiConfigured: true
-    });
-  }
-
-  return res.status(500).json({
-    success: false,
-    apiConfigured: false,
-    error: result.error
-  });
-});
-
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
-  logBrevoEmailStartupStatus();
 });

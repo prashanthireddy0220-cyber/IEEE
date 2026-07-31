@@ -5,8 +5,6 @@ const shouldSeedDemoUsers = () => (
   && process.env.SEED_DEMO_USERS !== 'false'
 );
 
-const demoPassword = () => process.env.DEMO_USER_PASSWORD || 'password123';
-
 const demoUsers = () => [
   {
     name: 'IEEE Demo User',
@@ -28,19 +26,11 @@ const demoUsers = () => [
 export const seedDemoUsers = async () => {
   if (!shouldSeedDemoUsers()) return;
 
-  const password = demoPassword();
-
   for (const demoUser of demoUsers()) {
-    const existingUser = await User.findOne({ email: demoUser.email }).select('+password');
+    const existingUser = await User.findOne({ email: demoUser.email });
 
     if (existingUser) {
       let changed = false;
-
-      const passwordMatches = await existingUser.comparePassword(password);
-      if (!passwordMatches) {
-        existingUser.password = password;
-        changed = true;
-      }
 
       if (!existingUser.isActive) {
         existingUser.isActive = true;
@@ -55,8 +45,6 @@ export const seedDemoUsers = async () => {
 
       if (existingUser.emailVerified === false) {
         existingUser.emailVerified = true;
-        existingUser.emailVerificationToken = undefined;
-        existingUser.emailVerificationExpires = undefined;
         changed = true;
       }
 
@@ -69,11 +57,10 @@ export const seedDemoUsers = async () => {
 
     await User.create({
       ...demoUser,
-      password,
       emailVerified: true,
       isActive: true
     });
   }
 
-  console.log(`Demo login users are ready. Password: ${password}`);
+  console.log('Demo profile users are ready. Create matching Firebase Auth users to sign in.');
 };

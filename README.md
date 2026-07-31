@@ -51,8 +51,7 @@ A premium, modern, and fully responsive website for IEEE Education Society Stude
 - Node.js
 - Express
 - MongoDB
-- JWT Authentication
-- Bcrypt (password hashing)
+- Firebase Admin SDK authentication
 
 ## Installation & Setup
 
@@ -73,7 +72,7 @@ npm install
 # Setup environment variables
 cp .env.example .env
 
-# Edit .env file with your MongoDB URI and JWT secret
+# Edit .env file with your MongoDB URI and Firebase Admin credentials
 ```
 
 ### 2. MongoDB Setup
@@ -248,8 +247,14 @@ Use the Dashboard → Achievements Manager to record achievements.
 # MongoDB
 MONGODB_URI=mongodb://localhost:27017/ieee-sbc
 
-# JWT
-JWT_SECRET=your_secure_jwt_secret_key
+# Firebase Admin
+FIREBASE_SERVICE_ACCOUNT={"type":"service_account",...}
+# Or on Render, add this Secret File:
+# /etc/secrets/firebase-service-account.json
+# Or use split environment variables:
+# FIREBASE_PROJECT_ID=
+# FIREBASE_CLIENT_EMAIL=
+# FIREBASE_PRIVATE_KEY=
 
 # Server
 PORT=5000
@@ -257,6 +262,12 @@ NODE_ENV=development
 
 # Frontend
 VITE_API_URL=http://localhost:5000
+VITE_FIREBASE_API_KEY=
+VITE_FIREBASE_AUTH_DOMAIN=
+VITE_FIREBASE_PROJECT_ID=
+VITE_FIREBASE_STORAGE_BUCKET=
+VITE_FIREBASE_MESSAGING_SENDER_ID=
+VITE_FIREBASE_APP_ID=
 ```
 
 ## Deployment
@@ -289,8 +300,7 @@ npm start
 - Responsive images
 
 ## Security Features
-- JWT-based authentication
-- Password hashing with bcryptjs
+- Firebase Authentication with Admin SDK token verification
 - Role-based access control
 - CORS enabled
 - XSS protection

@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 import { Link } from 'react-router-dom';
 import { FiArrowRight, FiMail } from 'react-icons/fi';
+import { sendPasswordResetEmail } from 'firebase/auth';
+import { auth } from '../firebase';
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState('');
@@ -16,17 +17,10 @@ export default function ForgotPassword() {
     setError('');
 
     try {
-      const response = await axios.post('/api/auth/forgot-password', { email: email.trim().toLowerCase() });
-      setMessage(response.data.message);
+      await sendPasswordResetEmail(auth, email.trim().toLowerCase());
+      setMessage('If the email is registered, password reset instructions will be sent.');
     } catch (error) {
-      const serverMessage = error.response?.data?.message;
-      if (serverMessage) {
-        setError(serverMessage);
-      } else if (error.code === 'ERR_NETWORK' || !error.response) {
-        setError('Unable to reach the server. Please try again later.');
-      } else {
-        setError('Unable to send password reset email. Please try again later.');
-      }
+      setError('Unable to send password reset email. Please try again later.');
     } finally {
       setLoading(false);
     }

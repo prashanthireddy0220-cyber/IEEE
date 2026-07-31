@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 import { Link, useSearchParams } from 'react-router-dom';
 import { FiArrowRight, FiLock } from 'react-icons/fi';
+import { confirmPasswordReset } from 'firebase/auth';
+import { auth } from '../firebase';
 
 export default function ResetPassword() {
   const passwordHelp = 'Use at least 8 characters and include one special character.';
@@ -11,8 +12,8 @@ export default function ResetPassword() {
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const token = searchParams.get('token') || '';
-  const hasResetToken = Boolean(token);
+  const oobCode = searchParams.get('oobCode') || '';
+  const hasResetToken = Boolean(oobCode);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -36,21 +37,12 @@ export default function ResetPassword() {
 
     setLoading(true);
     try {
-      const response = await axios.post('/api/auth/reset-password', { token, password });
-      setMessage(response.data.message);
+      await confirmPasswordReset(auth, oobCode, password);
+      setMessage('Password has been reset.');
       setPassword('');
       setConfirmPassword('');
     } catch (err) {
-      const serverMessage = err.response?.data?.message;
-      if (serverMessage === 'Invalid request') {
-        setError('This reset link is invalid or expired. Please request a new password reset link.');
-      } else if (serverMessage) {
-        setError(serverMessage);
-      } else if (err.code === 'ERR_NETWORK' || !err.response) {
-        setError('Unable to reach the server. Please try again later.');
-      } else {
-        setError('Unable to reset password. Please try again later.');
-      }
+      setError('This reset link is invalid or expired. Please request a new password reset link.');
     } finally {
       setLoading(false);
     }

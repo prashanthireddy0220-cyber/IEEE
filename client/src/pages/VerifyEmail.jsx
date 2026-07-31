@@ -1,24 +1,30 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import { Link, useSearchParams } from 'react-router-dom';
+import { applyActionCode } from 'firebase/auth';
+import { auth } from '../firebase';
 
 export default function VerifyEmail() {
   const [searchParams] = useSearchParams();
   const [message, setMessage] = useState('Verifying your account...');
-  const token = searchParams.get('token') || '';
+  const oobCode = searchParams.get('oobCode') || '';
 
   useEffect(() => {
     const verify = async () => {
       try {
-        const response = await axios.post('/api/auth/verify-email', { token });
-        setMessage(response.data.message);
+        if (!oobCode) {
+          setMessage('This verification link is missing or invalid.');
+          return;
+        }
+
+        await applyActionCode(auth, oobCode);
+        setMessage('Your email has been verified. You can now log in.');
       } catch (error) {
-        setMessage('If the verification link is valid, the account has been verified.');
+        setMessage('This verification link is invalid or expired.');
       }
     };
 
     verify();
-  }, [token]);
+  }, [oobCode]);
 
   return (
     <div className="section-shell flex min-h-screen items-center justify-center pt-24">

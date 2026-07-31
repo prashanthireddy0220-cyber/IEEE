@@ -1,5 +1,14 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import axios from 'axios';
+import {
+  createUserWithEmailAndPassword,
+  onAuthStateChanged,
+  sendEmailVerification,
+  signInWithEmailAndPassword,
+  signOut,
+  updateProfile
+} from 'firebase/auth';
+import { auth } from '../firebase';
 
 const AuthContext = createContext();
 const apiBaseUrl = (
@@ -8,7 +17,6 @@ const apiBaseUrl = (
 ).replace(/\/$/, '');
 
 axios.defaults.baseURL = apiBaseUrl;
-axios.defaults.withCredentials = true;
 
 const getApiErrorMessage = (error, fallbackMessage) => {
   const data = error.response?.data;
@@ -22,61 +30,115 @@ const getApiErrorMessage = (error, fallbackMessage) => {
   return fallbackMessage;
 };
 
+const getFirebaseErrorMessage = (error, fallbackMessage) => {
+  const messages = {
+    'auth/email-already-in-use': 'An account already exists for this email. Please login or use Forgot password.',
+    'auth/invalid-credential': 'Invalid credentials',
+    'auth/invalid-email': 'Enter a valid email address.',
+    'auth/too-many-requests': 'Too many attempts. Please try again later.',
+    'auth/user-disabled': 'This account has been disabled.',
+    'auth/weak-password': 'Use a stronger password.'
+  };
+
+  return messages[error?.code] || fallbackMessage;
+};
+
+const syncMongoProfile = async (firebaseUser, name) => {
+  const idToken = await firebaseUser.getIdToken(true);
+  axios.defaults.headers.common.Authorization = `Bearer ${idToken}`;
+  const response = await axios.post('/api/auth/session', { name });
+  return response.data.user;
+};
+
+axios.interceptors.request.use(async (config) => {
+  const firebaseUser = auth.currentUser;
+  if (firebaseUser) {
+    const idToken = await firebaseUser.getIdToken();
+    config.headers = config.headers || {};
+    config.headers.Authorization = `Bearer ${idToken}`;
+  }
+  return config;
+});
+
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const restoreSession = async () => {
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      if (!firebaseUser) {
+        setUser(null);
+        delete axios.defaults.headers.common.Authorization;
+        setLoading(false);
+        return;
+      }
+
       try {
-        const response = await axios.get('/api/auth/me');
-        setUser(response.data.user);
+        await firebaseUser.reload();
+        if (!firebaseUser.emailVerified) {
+          setUser(null);
+          delete axios.defaults.headers.common.Authorization;
+          setLoading(false);
+          return;
+        }
+
+        const userData = await syncMongoProfile(firebaseUser, firebaseUser.displayName);
+        setUser(userData);
       } catch (error) {
         setUser(null);
+        delete axios.defaults.headers.common.Authorization;
       } finally {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        delete axios.defaults.headers.common['Authorization'];
         setLoading(false);
       }
-    };
+    });
 
-    restoreSession();
+    return unsubscribe;
   }, []);
 
   const login = async (email, password) => {
     try {
-      const response = await axios.post('/api/auth/login', { email, password });
-      const { user: userData } = response.data;
+      const credential = await signInWithEmailAndPassword(auth, email.trim().toLowerCase(), password);
+      await credential.user.reload();
+
+      if (!credential.user.emailVerified) {
+        await sendEmailVerification(credential.user);
+        await signOut(auth);
+        throw 'Please verify your email before logging in. A new verification email has been sent.';
+      }
+
+      const userData = await syncMongoProfile(credential.user, credential.user.displayName);
       setUser(userData);
       return userData;
     } catch (error) {
-      throw getApiErrorMessage(error, 'Invalid credentials');
+      if (typeof error === 'string') throw error;
+      throw getFirebaseErrorMessage(error, 'Invalid credentials');
     }
   };
 
   const register = async (name, email, password) => {
     try {
-      const response = await axios.post('/api/auth/register', {
-        name: name.trim(),
-        email: email.trim().toLowerCase(),
-        password
-      });
-      if (response.data.user) {
-        setUser(response.data.user);
-      }
-      return response.data;
+      const credential = await createUserWithEmailAndPassword(auth, email.trim().toLowerCase(), password);
+      await updateProfile(credential.user, { displayName: name.trim() });
+      await sendEmailVerification(credential.user);
+      await syncMongoProfile(credential.user, name.trim());
+      await signOut(auth);
+
+      return {
+        message: 'Account created. Check your inbox and verify your email before logging in.'
+      };
     } catch (error) {
-      throw getApiErrorMessage(error, 'Unable to process request');
+      if (error.response) {
+        throw getApiErrorMessage(error, 'Unable to process request');
+      }
+      throw getFirebaseErrorMessage(error, 'Unable to process request');
     }
   };
 
-  const logout = () => {
+  const logout = async () => {
     axios.post('/api/auth/logout').catch(() => {});
+    await signOut(auth);
     setUser(null);
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    delete axios.defaults.headers.common['Authorization'];
+    delete axios.defaults.headers.common.Authorization;
   };
 
   return (
