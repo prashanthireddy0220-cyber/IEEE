@@ -36,7 +36,7 @@ const getBearerToken = (req) => {
 const getFrontendUrl = () => (
   process.env.FRONTEND_URL ||
   process.env.CLIENT_ORIGIN ||
-  'https://ieee-jpc3.vercel.app'
+  'https://ieee-jpc3.vercel.com'
 ).trim().replace(/\/$/, '');
 
 const toCustomActionLink = (firebaseLink, route) => {
@@ -109,10 +109,10 @@ router.post('/registration-emails', sessionLimiter, async (req, res) => {
     if (!email) return res.status(400).json({ message: 'Firebase account email is required' });
 
     const firebaseVerificationLink = await generateEmailVerificationLink(email, {
-      url: `${getFrontendUrl()}/email-verified`,
+      url: `${getFrontendUrl()}/auth/email-verified`,
       handleCodeInApp: false
     });
-    const verificationLink = toCustomActionLink(firebaseVerificationLink, '/email-verified');
+    const verificationLink = toCustomActionLink(firebaseVerificationLink, '/auth/email-verified');
 
     await sendRegistrationEmails({ email, name, verificationLink });
     res.json({ message: 'Registration emails sent successfully' });
@@ -131,10 +131,10 @@ router.post('/forgot-password', sessionLimiter, async (req, res) => {
 
     const user = await User.findOne({ email }).select('name email');
     const firebaseResetLink = await generatePasswordResetLink(email, {
-      url: `${getFrontendUrl()}/reset-password`,
+      url: `${getFrontendUrl()}/auth/reset-password`,
       handleCodeInApp: false
     });
-    const resetLink = toCustomActionLink(firebaseResetLink, '/reset-password');
+    const resetLink = toCustomActionLink(firebaseResetLink, '/auth/reset-password');
 
     await sendPasswordResetEmail({
       email,

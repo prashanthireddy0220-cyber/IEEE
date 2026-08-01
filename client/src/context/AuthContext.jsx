@@ -11,6 +11,12 @@ import {
 import { auth, firebaseConfigMissingMessage } from '../firebase';
 
 const AuthContext = createContext();
+const FRONTEND_URL = 'https://ieee-jpc3.vercel.com';
+
+const emailVerificationActionCodeSettings = {
+  url: `${FRONTEND_URL}/auth/email-verified`,
+  handleCodeInApp: false
+};
 
 const getApiErrorMessage = (error, fallbackMessage) => {
   const data = error.response?.data;
@@ -116,7 +122,7 @@ export const AuthProvider = ({ children }) => {
       const userCredential = await createUserWithEmailAndPassword(auth, email.trim().toLowerCase(), password);
       await updateProfile(userCredential.user, { displayName: name.trim() });
       await syncMongoProfile(userCredential.user, name.trim());
-      await sendEmailVerification(userCredential.user);
+      await sendEmailVerification(userCredential.user, emailVerificationActionCodeSettings);
       await signOut(auth);
 
       return {
