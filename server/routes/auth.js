@@ -143,10 +143,15 @@ router.post('/forgot-password', sessionLimiter, async (req, res) => {
     });
 
     res.json({ message: genericMessage });
-  } catch (error) {
-    console.error('Password reset email failed:', error.message);
-    res.json({ message: genericMessage });
-  }
+ } catch (error) {
+  console.error('Password reset email failed:', error);
+
+  return res.status(500).json({
+    message: error.message,
+    code: error.code,
+    stack: process.env.NODE_ENV !== 'production' ? error.stack : undefined
+  });
+}
 });
 
 const getCurrentSession = async (req, res) => {
