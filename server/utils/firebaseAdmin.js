@@ -43,3 +43,8 @@ export const generateEmailVerificationLink = async (email, actionCodeSettings) =
   const firebase = getFirebaseAdmin();
   return getAuth(firebase).generateEmailVerificationLink(email, actionCodeSettings);
 };
+
+export const generatePasswordResetLink = async (email, actionCodeSettings) => {
+  const firebase = getFirebaseAdmin();
+  return getAuth(firebase).generatePasswordResetLink(email, actionCodeSettings);
+};

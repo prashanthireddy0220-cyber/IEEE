@@ -29,6 +29,13 @@ const sender = parseEmailFrom();
 
 const logoUrl = () => `${getFrontendUrl()}/assets/kare-logo-XYVYeZYh.jpeg`;
 
+const escapeHtml = (value = '') => String(value)
+  .replace(/&/g, '&amp;')
+  .replace(/</g, '&lt;')
+  .replace(/>/g, '&gt;')
+  .replace(/"/g, '&quot;')
+  .replace(/'/g, '&#039;');
+
 const shell = ({ preview, content }) => `
 <!doctype html>
 <html>
@@ -60,6 +67,7 @@ const shell = ({ preview, content }) => `
                 <div style="font-weight:700;color:#075985;">KARE IEEE Education Society</div>
                 <div><a href="${getFrontendUrl()}" style="color:#0369a1;text-decoration:none;">${getFrontendUrl()}</a></div>
                 <div>Support: <a href="mailto:${supportEmail}" style="color:#0369a1;text-decoration:none;">${supportEmail}</a></div>
+                <div style="margin-top:10px;">Copyright ${new Date().getFullYear()} KARE IEEE Education Society. All rights reserved.</div>
               </td>
             </tr>
           </table>
@@ -70,22 +78,26 @@ const shell = ({ preview, content }) => `
 </html>`;
 
 export const welcomeEmailTemplate = ({ name }) => shell({
-  preview: 'Welcome to IEEE Education Society',
+  preview: 'Welcome to KARE IEEE Education Society',
   content: `
-    <h1 style="margin:0 0 16px;color:#075985;font-size:28px;line-height:1.2;">Welcome, ${name}!</h1>
+    <h1 style="margin:0 0 16px;color:#075985;font-size:28px;line-height:1.2;">Welcome, ${escapeHtml(name)}!</h1>
     <p style="margin:0 0 16px;color:#334155;font-size:16px;line-height:1.7;">
       We are delighted to welcome you to the KARE IEEE Education Society community.
     </p>
-    <p style="margin:0;color:#334155;font-size:16px;line-height:1.7;">
-      Your member account has been created successfully. Once your email is verified, you can sign in to the chapter portal and access member resources, events, and dashboard features.
-    </p>`
+    <p style="margin:0 0 22px;color:#334155;font-size:16px;line-height:1.7;">
+      Thank you for joining us. Once your email is verified, your member account will unlock chapter updates and digital resources.
+    </p>
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#eff6ff;border-radius:14px;padding:18px;border:1px solid #bfdbfe;">
+      <tr><td style="color:#075985;font-weight:700;padding-bottom:10px;">What you can explore</td></tr>
+      <tr><td style="color:#334155;font-size:15px;line-height:1.9;">Events<br>Gallery<br>Team<br>Resources<br>Member Dashboard</td></tr>
+    </table>`
 });
 
 export const verificationEmailTemplate = ({ name, verificationLink }) => shell({
-  preview: 'Verify your IEEE Education Society account',
+  preview: 'Verify Your KARE IEEE Education Society Account',
   content: `
     <h1 style="margin:0 0 16px;color:#075985;font-size:28px;line-height:1.2;">Verify your email</h1>
-    <p style="margin:0 0 16px;color:#334155;font-size:16px;line-height:1.7;">Hello ${name},</p>
+    <p style="margin:0 0 16px;color:#334155;font-size:16px;line-height:1.7;">Hello ${escapeHtml(name)},</p>
     <p style="margin:0 0 26px;color:#334155;font-size:16px;line-height:1.7;">
       Please confirm your email address to activate your IEEE Education Society account.
     </p>
@@ -95,8 +107,33 @@ export const verificationEmailTemplate = ({ name, verificationLink }) => shell({
       </a>
     </div>
     <p style="margin:24px 0 0;color:#64748b;font-size:13px;line-height:1.7;">
+      Security note: this link is intended only for you. If you did not create this account, you can ignore this email.
+    </p>
+    <p style="margin:14px 0 0;color:#64748b;font-size:13px;line-height:1.7;">
       If the button does not work, copy and paste this link into your browser:<br>
       <a href="${verificationLink}" style="color:#0369a1;word-break:break-all;">${verificationLink}</a>
+    </p>`
+});
+
+export const passwordResetEmailTemplate = ({ name, resetLink }) => shell({
+  preview: 'Reset Your Password - KARE IEEE Education Society',
+  content: `
+    <h1 style="margin:0 0 16px;color:#075985;font-size:28px;line-height:1.2;">Reset your password</h1>
+    <p style="margin:0 0 16px;color:#334155;font-size:16px;line-height:1.7;">Hello ${escapeHtml(name)},</p>
+    <p style="margin:0 0 26px;color:#334155;font-size:16px;line-height:1.7;">
+      We received a request to reset the password for your KARE IEEE Education Society account.
+    </p>
+    <div style="text-align:center;margin:30px 0;">
+      <a href="${resetLink}" style="display:inline-block;background:#0369a1;color:#ffffff;text-decoration:none;font-weight:700;padding:14px 28px;border-radius:10px;font-size:16px;">
+        Reset Password
+      </a>
+    </div>
+    <p style="margin:24px 0 0;color:#64748b;font-size:13px;line-height:1.7;">
+      Security note: if you did not request this reset, you can safely ignore this email. Your password will remain unchanged.
+    </p>
+    <p style="margin:14px 0 0;color:#64748b;font-size:13px;line-height:1.7;">
+      If the button does not work, copy and paste this link into your browser:<br>
+      <a href="${resetLink}" style="color:#0369a1;word-break:break-all;">${resetLink}</a>
     </p>`
 });
 
@@ -131,13 +168,21 @@ export const sendRegistrationEmails = async ({ email, name, verificationLink }) 
 
   await sendEmail({
     to: recipient,
-    subject: 'Welcome to IEEE Education Society',
+    subject: 'Welcome to KARE IEEE Education Society',
     html: welcomeEmailTemplate({ name })
   });
 
   await sendEmail({
     to: recipient,
-    subject: 'Verify your IEEE Education Society email',
+    subject: 'Verify Your KARE IEEE Education Society Account',
     html: verificationEmailTemplate({ name, verificationLink })
+  });
+};
+
+export const sendPasswordResetEmail = async ({ email, name, resetLink }) => {
+  await sendEmail({
+    to: [{ email, name }],
+    subject: 'Reset Your Password - KARE IEEE Education Society',
+    html: passwordResetEmailTemplate({ name, resetLink })
   });
 };

@@ -17,8 +17,8 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
-import VerifyEmail from './pages/VerifyEmail';
 import EmailVerified from './pages/EmailVerified';
+import PasswordResetSuccess from './pages/PasswordResetSuccess';
 import Dashboard from './pages/Dashboard';
 import './styles/globals.css';
 
@@ -44,8 +44,8 @@ function App() {
                 <Route path="/register" element={<Register />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
-                <Route path="/verify-email" element={<VerifyEmail />} />
                 <Route path="/email-verified" element={<EmailVerified />} />
+                <Route path="/password-reset-success" element={<PasswordResetSuccess />} />
                 <Route path="/dashboard/*" element={<Dashboard />} />
               </Routes>
             </main>
