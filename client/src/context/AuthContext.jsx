@@ -3,7 +3,6 @@ import axios from '../api/axios';
 import {
   createUserWithEmailAndPassword,
   onAuthStateChanged,
-  sendEmailVerification,
   signInWithEmailAndPassword,
   signOut,
   updateProfile
@@ -42,6 +41,12 @@ const syncMongoProfile = async (firebaseUser, name) => {
   axios.defaults.headers.common.Authorization = `Bearer ${idToken}`;
   const response = await axios.post('/api/auth/session', { name });
   return response.data.user;
+};
+
+const sendRegistrationEmails = async (firebaseUser, name) => {
+  const idToken = await firebaseUser.getIdToken(true);
+  axios.defaults.headers.common.Authorization = `Bearer ${idToken}`;
+  await axios.post('/api/auth/registration-emails', { name });
 };
 
 export const AuthProvider = ({ children }) => {
@@ -94,7 +99,7 @@ export const AuthProvider = ({ children }) => {
 
       if (!credential.user.emailVerified) {
         await signOut(auth);
-        throw new Error('Please verify your email before logging in.');
+        throw new Error('Please verify your email before signing in.');
       }
 
       const userData = await syncMongoProfile(credential.user, credential.user.displayName);
@@ -102,6 +107,9 @@ export const AuthProvider = ({ children }) => {
       return userData;
     } catch (error) {
       if (typeof error === 'string') throw error;
+      if (error?.message === 'Please verify your email before signing in.') {
+        throw error.message;
+      }
       throw getFirebaseErrorMessage(error, 'Invalid credentials');
     }
   };
@@ -112,12 +120,12 @@ export const AuthProvider = ({ children }) => {
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email.trim().toLowerCase(), password);
       await updateProfile(userCredential.user, { displayName: name.trim() });
-      await sendEmailVerification(userCredential.user);
       await syncMongoProfile(userCredential.user, name.trim());
+      await sendRegistrationEmails(userCredential.user, name.trim());
       await signOut(auth);
 
       return {
-        message: 'Account created successfully.\nPlease check your email (including Spam folder) and verify your email before logging in.'
+        message: 'Account created successfully.\nPlease check your email for a welcome message and verification link before signing in.'
       };
     } catch (error) {
       if (error.response) {

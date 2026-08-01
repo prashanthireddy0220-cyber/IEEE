@@ -2,7 +2,8 @@ import express from 'express';
 import User from '../models/User.js';
 import { authenticateToken } from '../middleware/auth.js';
 import { createRateLimiter } from '../middleware/security.js';
-import { verifyFirebaseIdToken } from '../utils/firebaseAdmin.js';
+import { generateEmailVerificationLink, verifyFirebaseIdToken } from '../utils/firebaseAdmin.js';
+import { sendRegistrationEmails } from '../utils/email.js';
 
 const router = express.Router();
 
@@ -31,6 +32,12 @@ const getBearerToken = (req) => {
   const authHeader = req.headers.authorization || '';
   return authHeader.startsWith('Bearer ') ? authHeader.slice(7) : '';
 };
+
+const getFrontendUrl = () => (
+  process.env.FRONTEND_URL ||
+  process.env.CLIENT_ORIGIN ||
+  'https://ieee-jpc3.vercel.app'
+).trim().replace(/\/$/, '');
 
 router.post('/session', sessionLimiter, async (req, res) => {
   try {
@@ -75,6 +82,30 @@ router.post('/session', sessionLimiter, async (req, res) => {
   } catch (error) {
     console.error('Firebase session failed:', error.message);
     res.status(401).json({ message: 'Authentication required' });
+  }
+});
+
+router.post('/registration-emails', sessionLimiter, async (req, res) => {
+  try {
+    const token = getBearerToken(req);
+    if (!token) return res.status(401).json({ message: 'Authentication required' });
+
+    const decoded = await verifyFirebaseIdToken(token);
+    const email = decoded.email?.trim().toLowerCase();
+    const name = (req.body?.name || decoded.name || email?.split('@')[0] || 'IEEE Member').trim();
+
+    if (!email) return res.status(400).json({ message: 'Firebase account email is required' });
+
+    const verificationLink = await generateEmailVerificationLink(email, {
+      url: `${getFrontendUrl()}/email-verified`,
+      handleCodeInApp: false
+    });
+
+    await sendRegistrationEmails({ email, name, verificationLink });
+    res.json({ message: 'Registration emails sent successfully' });
+  } catch (error) {
+    console.error('Registration email delivery failed:', error.message);
+    res.status(500).json({ message: 'Unable to send registration emails' });
   }
 });
 

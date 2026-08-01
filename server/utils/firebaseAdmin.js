@@ -38,3 +38,8 @@ export const verifyFirebaseIdToken = async (idToken) => {
   const firebase = getFirebaseAdmin();
   return getAuth(firebase).verifyIdToken(idToken);
 };
+
+export const generateEmailVerificationLink = async (email, actionCodeSettings) => {
+  const firebase = getFirebaseAdmin();
+  return getAuth(firebase).generateEmailVerificationLink(email, actionCodeSettings);
+};

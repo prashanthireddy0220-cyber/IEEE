@@ -18,6 +18,7 @@ import Register from './pages/Register';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import VerifyEmail from './pages/VerifyEmail';
+import EmailVerified from './pages/EmailVerified';
 import Dashboard from './pages/Dashboard';
 import './styles/globals.css';
 
@@ -44,6 +45,7 @@ function App() {
                 <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
                 <Route path="/verify-email" element={<VerifyEmail />} />
+                <Route path="/email-verified" element={<EmailVerified />} />
                 <Route path="/dashboard/*" element={<Dashboard />} />
               </Routes>
             </main>
