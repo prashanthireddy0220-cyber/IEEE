@@ -3,6 +3,7 @@ import axios from '../api/axios';
 import {
   createUserWithEmailAndPassword,
   onAuthStateChanged,
+  sendEmailVerification,
   signInWithEmailAndPassword,
   signOut,
   updateProfile
@@ -41,12 +42,6 @@ const syncMongoProfile = async (firebaseUser, name) => {
   axios.defaults.headers.common.Authorization = `Bearer ${idToken}`;
   const response = await axios.post('/api/auth/session', { name });
   return response.data.user;
-};
-
-const sendRegistrationEmails = async (firebaseUser, name) => {
-  const idToken = await firebaseUser.getIdToken(true);
-  axios.defaults.headers.common.Authorization = `Bearer ${idToken}`;
-  await axios.post('/api/auth/registration-emails', { name });
 };
 
 export const AuthProvider = ({ children }) => {
@@ -121,11 +116,12 @@ export const AuthProvider = ({ children }) => {
       const userCredential = await createUserWithEmailAndPassword(auth, email.trim().toLowerCase(), password);
       await updateProfile(userCredential.user, { displayName: name.trim() });
       await syncMongoProfile(userCredential.user, name.trim());
-      await sendRegistrationEmails(userCredential.user, name.trim());
+      await sendEmailVerification(userCredential.user);
       await signOut(auth);
 
       return {
-        message: 'Account created successfully.\nPlease check your email for a welcome message and verification link before signing in.'
+        message:
+          'Account created successfully. Please check your inbox and verify your email before signing in.'
       };
     } catch (error) {
       if (error.response) {
