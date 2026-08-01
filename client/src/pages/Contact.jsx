@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { FiMail, FiPhone, FiMapPin, FiLinkedin, FiInstagram } from 'react-icons/fi';
-import axios from 'axios';
 
 export default function Contact() {
   const [formData, setFormData] = useState({

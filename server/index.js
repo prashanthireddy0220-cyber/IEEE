@@ -14,6 +14,7 @@ import eventRoutes from './routes/events.js';
 import galleryRoutes from './routes/gallery.js';
 import teamRoutes from './routes/team.js';
 import contentRoutes from './routes/content.js';
+import achievementRoutes from './routes/achievements.js';
 import { seedDemoUsers } from './utils/seedDemoUsers.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -47,6 +48,7 @@ app.use('/api/events', eventRoutes);
 app.use('/api/gallery', galleryRoutes);
 app.use('/api/team', teamRoutes);
 app.use('/api/content', contentRoutes);
+app.use('/api/achievements', achievementRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import axios from 'axios';
+import axios from '../api/axios';
 import { FiCalendar, FiMapPin, FiUsers, FiArrowLeft } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
 import { getFallbackEventById } from '../data/fallbackEvents';

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import axios from 'axios';
+import axios from '../../api/axios';
 import { FiEdit2, FiTrash2, FiPlus } from 'react-icons/fi';
 
 export default function AchievementsManager() {

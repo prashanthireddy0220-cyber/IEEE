@@ -78,7 +78,7 @@ router.post('/session', sessionLimiter, async (req, res) => {
   }
 });
 
-router.get('/me', authenticateToken, async (req, res) => {
+const getCurrentSession = async (req, res) => {
   try {
     const user = await User.findById(req.user.id).select('-__v');
     if (!user) return res.status(401).json({ message: 'Authentication required' });
@@ -88,7 +88,10 @@ router.get('/me', authenticateToken, async (req, res) => {
     console.error('Session lookup failed:', error.message);
     res.status(401).json({ message: 'Authentication required' });
   }
-});
+};
+
+router.get('/session', authenticateToken, getCurrentSession);
+router.get('/me', authenticateToken, getCurrentSession);
 
 router.post('/logout', (req, res) => {
   res.json({ message: 'Logged out successfully' });

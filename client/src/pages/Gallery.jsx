@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
-import axios from 'axios';
+import axios from '../api/axios';
 
 const hyperLaunchModules = import.meta.glob('../assets/gallery/hyper-launch-*.{jpg,jpeg,png,webp}', {
   eager: true,

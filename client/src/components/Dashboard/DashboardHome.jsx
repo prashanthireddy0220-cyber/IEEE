@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import axios from 'axios';
+import axios from '../../api/axios';
 import { FiAward, FiCalendar, FiImage, FiTrendingUp, FiUsers } from 'react-icons/fi';
 import { useAuth } from '../../context/AuthContext';
 import { roleConfig } from '../../data/siteContent';

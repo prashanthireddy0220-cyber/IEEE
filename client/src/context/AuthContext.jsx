@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import axios from 'axios';
+import axios from '../api/axios';
 import {
   createUserWithEmailAndPassword,
   onAuthStateChanged,
@@ -11,12 +11,6 @@ import {
 import { auth, firebaseConfigMissingMessage } from '../firebase';
 
 const AuthContext = createContext();
-const apiBaseUrl = (
-  import.meta.env.VITE_API_URL ||
-  'https://ieee-backend-ny9t.onrender.com'
-).replace(/\/$/, '');
-
-axios.defaults.baseURL = apiBaseUrl;
 
 const getApiErrorMessage = (error, fallbackMessage) => {
   const data = error.response?.data;
@@ -49,18 +43,6 @@ const syncMongoProfile = async (firebaseUser, name) => {
   const response = await axios.post('/api/auth/session', { name });
   return response.data.user;
 };
-
-axios.interceptors.request.use(async (config) => {
-  if (!auth) return config;
-
-  const firebaseUser = auth.currentUser;
-  if (firebaseUser) {
-    const idToken = await firebaseUser.getIdToken();
-    config.headers = config.headers || {};
-    config.headers.Authorization = `Bearer ${idToken}`;
-  }
-  return config;
-});
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
