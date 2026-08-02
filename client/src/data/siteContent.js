@@ -52,7 +52,7 @@ export const roleConfig = {
 
 export const testimonials = [
   {
-    name: 'Ananya R.',
+    name: 'B.CHAITANYA',
     role: 'Student Volunteer',
     quote: 'IEEE Education Society gave me mentors, confidence, and a real platform to turn ideas into technical impact.'
   },

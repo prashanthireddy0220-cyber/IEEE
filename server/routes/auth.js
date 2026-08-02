@@ -62,6 +62,10 @@ router.post('/session', sessionLimiter, async (req, res) => {
 
     if (!email) return res.status(400).json({ message: 'Firebase account email is required' });
 
+    if (!email.endsWith('@klu.ac.in')) {
+      return res.status(403).json({ message: 'Access denied. Only @klu.ac.in email addresses are permitted.' });
+    }
+
     let user = await User.findOne({ $or: [{ firebaseUid: decoded.uid }, { email }] });
     if (user) {
       user.firebaseUid = decoded.uid;
@@ -87,17 +91,13 @@ router.post('/session', sessionLimiter, async (req, res) => {
     }
 
     if (!user.isActive) {
-      return res.status(403).json({ message: 'User account is inactive' });
+      return res.status(401).json({ message: 'Authentication required' });
     }
 
     res.json({ user: publicUser(user) });
   } catch (error) {
-    console.error('Firebase session failed:', error);
-    res.status(500).json({
-      message: error.message || 'Firebase session failed',
-      code: error.code,
-      stack: process.env.NODE_ENV !== 'production' ? error.stack : undefined
-    });
+    console.error('Firebase session failed:', error.message);
+    res.status(401).json({ message: 'Authentication required' });
   }
 });
 

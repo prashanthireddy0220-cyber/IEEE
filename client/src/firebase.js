@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
+import { getAuth, GoogleAuthProvider } from 'firebase/auth';
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -14,5 +14,12 @@ const isFirebaseConfigured = Object.values(firebaseConfig).every(Boolean);
 const app = isFirebaseConfigured ? initializeApp(firebaseConfig) : null;
 
 export const auth = app ? getAuth(app) : null;
+export const googleProvider = new GoogleAuthProvider();
+googleProvider.setCustomParameters({
+  hd: 'klu.ac.in',
+  prompt: 'select_account'
+});
+
 export const firebaseConfigMissingMessage = 'Firebase is not configured. Fill in the VITE_FIREBASE_* values in client/.env and restart the dev server.';
 export default app;
+

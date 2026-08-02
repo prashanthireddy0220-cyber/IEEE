@@ -1,21 +1,16 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import axios from '../api/axios';
 import {
-  createUserWithEmailAndPassword,
   onAuthStateChanged,
-  sendEmailVerification,
-  signInWithEmailAndPassword,
-  signOut,
-  updateProfile
+  signInWithPopup,
+  signOut
 } from 'firebase/auth';
-import { auth, firebaseConfigMissingMessage } from '../firebase';
+import { auth, googleProvider, firebaseConfigMissingMessage } from '../firebase';
 
 const AuthContext = createContext();
-const FRONTEND_URL = 'https://ieee-jpc3.vercel.app';
 
-const emailVerificationActionCodeSettings = {
-  url: `${FRONTEND_URL}/auth/email-verified`,
-  handleCodeInApp: false
+const isKluEmail = (email) => {
+  return Boolean(email && email.toLowerCase().trim().endsWith('@klu.ac.in'));
 };
 
 const getApiErrorMessage = (error, fallbackMessage) => {
@@ -32,12 +27,10 @@ const getApiErrorMessage = (error, fallbackMessage) => {
 
 const getFirebaseErrorMessage = (error, fallbackMessage) => {
   const messages = {
-    'auth/email-already-in-use': 'An account already exists for this email. Please login or use Forgot password.',
-    'auth/invalid-credential': 'Invalid credentials',
-    'auth/invalid-email': 'Enter a valid email address.',
-    'auth/too-many-requests': 'Too many attempts. Please try again later.',
+    'auth/popup-closed-by-user': 'Sign-in window was closed. Please try again.',
+    'auth/cancelled-popup-request': 'Sign-in popup request cancelled.',
     'auth/user-disabled': 'This account has been disabled.',
-    'auth/weak-password': 'Use a stronger password.'
+    'auth/account-exists-with-different-credential': 'An account already exists with a different credential.'
   };
 
   return messages[error?.code] || fallbackMessage;
@@ -69,15 +62,15 @@ export const AuthProvider = ({ children }) => {
         return;
       }
 
-      try {
-        await firebaseUser.reload();
-        if (!firebaseUser.emailVerified) {
-          setUser(null);
-          delete axios.defaults.headers.common.Authorization;
-          setLoading(false);
-          return;
-        }
+      if (!isKluEmail(firebaseUser.email)) {
+        await signOut(auth);
+        setUser(null);
+        delete axios.defaults.headers.common.Authorization;
+        setLoading(false);
+        return;
+      }
 
+      try {
         const userData = await syncMongoProfile(firebaseUser, firebaseUser.displayName);
         setUser(userData);
       } catch (error) {
@@ -91,49 +84,28 @@ export const AuthProvider = ({ children }) => {
     return unsubscribe;
   }, []);
 
-  const login = async (email, password) => {
+  const loginWithGoogle = async () => {
     if (!auth) throw firebaseConfigMissingMessage;
 
     try {
-      const credential = await signInWithEmailAndPassword(auth, email.trim().toLowerCase(), password);
-      await credential.user.reload();
+      const result = await signInWithPopup(auth, googleProvider);
+      const email = result.user?.email || '';
 
-      if (!credential.user.emailVerified) {
+      if (!isKluEmail(email)) {
         await signOut(auth);
-        throw new Error('Please verify your email before signing in.');
+        throw new Error('Access restricted: Only KL University email addresses (@klu.ac.in) are allowed to sign in.');
       }
 
-      const userData = await syncMongoProfile(credential.user, credential.user.displayName);
+      const userData = await syncMongoProfile(result.user, result.user.displayName);
       setUser(userData);
       return userData;
     } catch (error) {
       if (typeof error === 'string') throw error;
-      if (error?.message === 'Please verify your email before signing in.') {
-        throw error.message;
-      }
-      throw getFirebaseErrorMessage(error, 'Invalid credentials');
-    }
-  };
-
-  const register = async (name, email, password) => {
-    if (!auth) throw firebaseConfigMissingMessage;
-
-    try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email.trim().toLowerCase(), password);
-      await updateProfile(userCredential.user, { displayName: name.trim() });
-      await syncMongoProfile(userCredential.user, name.trim());
-      await sendEmailVerification(userCredential.user, emailVerificationActionCodeSettings);
-      await signOut(auth);
-
-      return {
-        message:
-          'Account created successfully. Please check your inbox and verify your email before signing in.'
-      };
-    } catch (error) {
+      if (error?.message?.includes('Access restricted')) throw error.message;
       if (error.response) {
-        throw getApiErrorMessage(error, 'Unable to process request');
+        throw getApiErrorMessage(error, 'Access denied for this account.');
       }
-      throw getFirebaseErrorMessage(error, 'Unable to process request');
+      throw getFirebaseErrorMessage(error, error.message || 'Google sign-in failed');
     }
   };
 
@@ -145,10 +117,11 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
+    <AuthContext.Provider value={{ user, loading, loginWithGoogle, logout }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
 export const useAuth = () => useContext(AuthContext);
+
