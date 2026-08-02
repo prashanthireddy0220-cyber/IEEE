@@ -36,7 +36,7 @@ const getBearerToken = (req) => {
 const getFrontendUrl = () => (
   process.env.FRONTEND_URL ||
   process.env.CLIENT_ORIGIN ||
-  'https://ieee-jpc3.vercel.app'
+  'https://kare-ieee-education-society.vercel.app'
 ).trim().replace(/\/$/, '');
 
 const toCustomActionLink = (firebaseLink, route) => {

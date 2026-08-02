@@ -3,7 +3,7 @@ const BREVO_API_URL = 'https://api.brevo.com/v3/smtp/email';
 const getFrontendUrl = () => (
   process.env.FRONTEND_URL ||
   process.env.CLIENT_ORIGIN ||
-  'https://ieee-jpc3.vercel.app'
+  'https://kare-ieee-education-society.vercel.app'
 ).trim().replace(/\/$/, '');
 
 const supportEmail = process.env.SUPPORT_EMAIL || 'kareieeeeducationsociety2026@gmail.com';
