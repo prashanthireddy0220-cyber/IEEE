@@ -3,7 +3,7 @@ import { auth } from '../firebase';
 
 export const apiBaseUrl = (
   import.meta.env.VITE_API_URL ||
-  'https://ieee-backend-ny9t.onrender.com'
+  'https://ieee-backend-ny9t.onrender.app'
 ).replace(/\/$/, '');
 
 axios.defaults.baseURL = apiBaseUrl;
