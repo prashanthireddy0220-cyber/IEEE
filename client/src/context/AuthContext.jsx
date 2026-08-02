@@ -11,7 +11,7 @@ import {
 import { auth, firebaseConfigMissingMessage } from '../firebase';
 
 const AuthContext = createContext();
-const FRONTEND_URL = 'https://ieee-jpc3.vercel.com';
+const FRONTEND_URL = 'https://ieee-jpc3.vercel.app';
 
 const emailVerificationActionCodeSettings = {
   url: `${FRONTEND_URL}/auth/email-verified`,
@@ -40,7 +40,7 @@ const getFirebaseErrorMessage = (error, fallbackMessage) => {
     'auth/weak-password': 'Use a stronger password.'
   };
 
-  return messages[error?.code] || fallbackMessage;
+  return messages[error?.code] || error?.message || fallbackMessage;
 };
 
 const syncMongoProfile = async (firebaseUser, name) => {
@@ -48,6 +48,11 @@ const syncMongoProfile = async (firebaseUser, name) => {
   axios.defaults.headers.common.Authorization = `Bearer ${idToken}`;
   const response = await axios.post('/api/auth/session', { name });
   return response.data.user;
+};
+
+const logRegistrationStep = (step, status, details) => {
+  const log = status === 'failed' ? console.error : console.log;
+  log(`[Registration] ${step} ${status}`, details || '');
 };
 
 export const AuthProvider = ({ children }) => {
@@ -118,23 +123,71 @@ export const AuthProvider = ({ children }) => {
   const register = async (name, email, password) => {
     if (!auth) throw firebaseConfigMissingMessage;
 
-    try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email.trim().toLowerCase(), password);
-      await updateProfile(userCredential.user, { displayName: name.trim() });
-      await syncMongoProfile(userCredential.user, name.trim());
-      await sendEmailVerification(userCredential.user, emailVerificationActionCodeSettings);
-      await signOut(auth);
+    const trimmedName = name.trim();
+    const normalizedEmail = email.trim().toLowerCase();
+    let firebaseUser = null;
+    const nonCriticalFailures = [];
 
-      return {
-        message:
-          'Account created successfully. Please check your inbox and verify your email before signing in.'
-      };
+    try {
+      logRegistrationStep('createUserWithEmailAndPassword', 'started', { email: normalizedEmail });
+      const userCredential = await createUserWithEmailAndPassword(auth, normalizedEmail, password);
+      firebaseUser = userCredential.user;
+      logRegistrationStep('createUserWithEmailAndPassword', 'succeeded', { uid: firebaseUser.uid });
     } catch (error) {
-      if (error.response) {
-        throw getApiErrorMessage(error, 'Unable to process request');
-      }
-      throw getFirebaseErrorMessage(error, 'Unable to process request');
+      logRegistrationStep('createUserWithEmailAndPassword', 'failed', error);
+      throw getFirebaseErrorMessage(error, 'Unable to create account. Please try again.');
     }
+
+    try {
+      logRegistrationStep('updateProfile', 'started', { uid: firebaseUser.uid, displayName: trimmedName });
+      await updateProfile(firebaseUser, { displayName: trimmedName });
+      logRegistrationStep('updateProfile', 'succeeded', { uid: firebaseUser.uid });
+    } catch (error) {
+      logRegistrationStep('updateProfile', 'failed', error);
+      nonCriticalFailures.push('Your account was created, but we could not save your display name.');
+    }
+
+    try {
+      logRegistrationStep('syncMongoProfile', 'started', { uid: firebaseUser.uid });
+      await syncMongoProfile(firebaseUser, trimmedName);
+      logRegistrationStep('syncMongoProfile', 'succeeded', { uid: firebaseUser.uid });
+    } catch (error) {
+      logRegistrationStep('syncMongoProfile', 'failed', error);
+      nonCriticalFailures.push(
+        `Your Firebase account was created, but we could not save your profile in MongoDB: ${getApiErrorMessage(error, 'Profile sync failed')}`
+      );
+    }
+
+    try {
+      logRegistrationStep('sendEmailVerification', 'started', { uid: firebaseUser.uid });
+      await sendEmailVerification(firebaseUser, emailVerificationActionCodeSettings);
+      logRegistrationStep('sendEmailVerification', 'succeeded', { uid: firebaseUser.uid });
+    } catch (error) {
+      logRegistrationStep('sendEmailVerification', 'failed', error);
+      nonCriticalFailures.push(
+        `Your account was created, but we could not send the verification email: ${getFirebaseErrorMessage(error, 'Email verification failed')}`
+      );
+    }
+
+    try {
+      logRegistrationStep('signOut', 'started', { uid: firebaseUser.uid });
+      await signOut(auth);
+      logRegistrationStep('signOut', 'succeeded', { uid: firebaseUser.uid });
+    } catch (error) {
+      logRegistrationStep('signOut', 'failed', error);
+      nonCriticalFailures.push('Your account was created, but we could not sign you out automatically. Please sign out and verify your email before signing in.');
+    }
+
+    if (nonCriticalFailures.length) {
+      return {
+        message: nonCriticalFailures.join(' ')
+      };
+    }
+
+    return {
+      message:
+        'Account created successfully. Please check your inbox and verify your email before signing in.'
+    };
   };
 
   const logout = async () => {
