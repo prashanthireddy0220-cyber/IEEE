@@ -10,7 +10,7 @@ export default function Team() {
   const [role, setRole] = useState('all');
   const [loading, setLoading] = useState(true);
   const teamRoleLabels = {
-    'sbc-counsellor': 'SBC Counsellor',
+    'sbc-counsellor': 'SBC CHANCELLOR',
     faculty: 'Faculty',
     chairman: 'Chairperson',
     'student-chairperson': 'Vice Chairperson',
