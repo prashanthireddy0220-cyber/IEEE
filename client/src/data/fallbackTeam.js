@@ -38,6 +38,7 @@ export const fallbackTeamMembers = [
     email: 'chinnasamyponnusamy@gmail.com',
     phone: '9600281664',
     photo: chinnaSamyPhoto,
+    photoPosition: 'center 38%',
     socialMedia: {
       linkedin: 'https://www.linkedin.com/in/dr-p-chinnasamy-52674b3b?utm_source=share_via&utm_content=profile&utm_medium=member_ios',
       instagram: ''

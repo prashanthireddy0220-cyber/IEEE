@@ -5,7 +5,7 @@ import { roleConfig } from '../data/siteContent';
 
 export default function TeamMemberCard({ member }) {
   const displayRoleMap = {
-    'sbc-counsellor': 'SBC CHANCELLOR',
+    'sbc-counsellor': 'SBC Counselor',
     faculty: 'Faculty',
     chairman: 'Chairperson',
     'student-chairperson': 'Vice Chairperson',
